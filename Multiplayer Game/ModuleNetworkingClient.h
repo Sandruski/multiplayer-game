@@ -63,7 +63,7 @@ private:
     InputPacketData inputData[MAX_INPUT_DATA_SIMULTANEOUS_PACKETS];
     uint32 inputDataFront = 0;
     uint32 inputDataBack = 0;
-	uint32 nextExpectedInputSequenceNumberFromServer = 0;
+    uint32 nextExpectedInputSequenceNumberFromServer = 0;
 
     float inputDeliveryIntervalSeconds = 0.05f;
     float secondsSinceLastInputDelivery = 0.0f;
@@ -74,4 +74,5 @@ private:
     float secondsSinceLastPing = 0.0f; // NOTE(jesus): Use this to implement ping to server
 
     ReplicationManagerClient m_replicationManager;
+    DeliveryManager m_deliveryManager;
 };

@@ -115,16 +115,22 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream& packet, c
         }
     } else if (state == ClientState::Playing) {
         // TODO(jesus): Handle incoming messages from server
-		if (message == ServerMessage::Ping)
-			lastPacketReceivedTime = Time.time;
-		else if (message == ServerMessage::Replication)
-		{
-			UINT32 recvNextExpectedInputSequenceNumber;
-			packet.Read(recvNextExpectedInputSequenceNumber);
-			inputDataFront = recvNextExpectedInputSequenceNumber;
-			m_replicationManager.read(packet);
-		}
+        if (message == ServerMessage::Ping)
+            lastPacketReceivedTime = Time.time;
+        else if (message == ServerMessage::Replication) {
+            uint32 sequenceNumber;
+            packet.Read(sequenceNumber);
+            if (m_deliveryManager.processSequenceNumber(sequenceNumber)) {
+                inputDataFront = sequenceNumber;
+                m_replicationManager.read(packet);
+            }
+        }
     }
+
+    OutputMemoryStream stream;
+    stream << ClientMessage::Ack;
+    m_deliveryManager.writeSequenceNumbersPendingAck(stream);
+    sendPacket(stream, fromAddress);
 }
 
 void ModuleNetworkingClient::onUpdate()
@@ -147,46 +153,45 @@ void ModuleNetworkingClient::onUpdate()
     } else if (state == ClientState::Playing) {
         secondsSinceLastInputDelivery += Time.deltaTime;
 
-		if (inputDataBack - inputDataFront < ArrayCount(inputData)) {
-			uint32 currentInputData = inputDataBack++;
-			InputPacketData& inputPacketData = inputData[currentInputData % ArrayCount(inputData)];
-			inputPacketData.sequenceNumber = currentInputData;
-			inputPacketData.horizontalAxis = Input.horizontalAxis;
-			inputPacketData.verticalAxis = Input.verticalAxis;
-			inputPacketData.buttonBits = packInputControllerButtons(Input);
+        if (inputDataBack - inputDataFront < ArrayCount(inputData)) {
+            uint32 currentInputData = inputDataBack++;
+            InputPacketData& inputPacketData = inputData[currentInputData % ArrayCount(inputData)];
+            inputPacketData.sequenceNumber = currentInputData;
+            inputPacketData.horizontalAxis = Input.horizontalAxis;
+            inputPacketData.verticalAxis = Input.verticalAxis;
+            inputPacketData.buttonBits = packInputControllerButtons(Input);
 
-			// Create packet (if there's input and the input delivery interval exceeded)
-			if (secondsSinceLastInputDelivery > inputDeliveryIntervalSeconds) {
-				secondsSinceLastInputDelivery = 0.0f;
+            // Create packet (if there's input and the input delivery interval exceeded)
+            if (secondsSinceLastInputDelivery > inputDeliveryIntervalSeconds) {
+                secondsSinceLastInputDelivery = 0.0f;
 
-				OutputMemoryStream packet;
-				packet << ClientMessage::Input;
+                OutputMemoryStream packet;
+                packet << ClientMessage::Input;
 
-				for (uint32 i = inputDataFront; i < inputDataBack; ++i) {
-					InputPacketData& inputPacketData = inputData[i % ArrayCount(inputData)];
-					packet << inputPacketData.sequenceNumber;
-					packet << inputPacketData.horizontalAxis;
-					packet << inputPacketData.verticalAxis;
-					packet << inputPacketData.buttonBits;
-				}
+                for (uint32 i = inputDataFront; i < inputDataBack; ++i) {
+                    InputPacketData& inputPacketData = inputData[i % ArrayCount(inputData)];
+                    packet << inputPacketData.sequenceNumber;
+                    packet << inputPacketData.horizontalAxis;
+                    packet << inputPacketData.verticalAxis;
+                    packet << inputPacketData.buttonBits;
+                }
 
-				// Clear the queue
-				//inputDataFront = inputDataBack;
-				sendPacket(packet, serverAddress);
-			}
+                // Clear the queue
+                //inputDataFront = inputDataBack;
+                sendPacket(packet, serverAddress);
+            }
+        }
+        secondsSinceLastPing += Time.deltaTime;
 
-		}
-		secondsSinceLastPing += Time.deltaTime;
+        if (secondsSinceLastPing >= PING_INTERVAL_SECONDS) {
+            OutputMemoryStream packet;
+            packet << ClientMessage::Ping;
+            sendPacket(packet, serverAddress);
+            secondsSinceLastPing = 0.0f;
+        }
 
-		if (secondsSinceLastPing >= PING_INTERVAL_SECONDS) {
-			OutputMemoryStream packet;
-			packet << ClientMessage::Ping;
-			sendPacket(packet, serverAddress);
-			secondsSinceLastPing = 0.0f;
-		}
-
-		if (Time.time - lastPacketReceivedTime >= DISCONNECT_TIMEOUT_SECONDS)
-			disconnect();
+        if (Time.time - lastPacketReceivedTime >= DISCONNECT_TIMEOUT_SECONDS)
+            disconnect();
     }
 
     // Make the camera focus the player game object

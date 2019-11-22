@@ -170,7 +170,11 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream& packet, c
             if (proxy != nullptr) {
                 proxy->lastPacketReceivedTime = Time.time;
             }
+        } else if (message == ClientMessage::Ack) {
+            proxy->m_deliveryManager.processAckSequenceNumbers(packet);
         }
+
+        proxy->m_deliveryManager.processTimedOutPackets();
     }
 }
 

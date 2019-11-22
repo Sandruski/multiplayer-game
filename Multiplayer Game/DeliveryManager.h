@@ -22,7 +22,7 @@ public:
     // For senders to write a new sequence number into a packet
     Delivery* writeSequenceNumber(OutputMemoryStream& packet);
     // For receivers to process the sequence number from an incoming packet
-    bool processSequenceNumber(const InputMemoryStream& packet);
+    bool processSequenceNumber(uint32 sequenceNumber);
 
     // For receivers to write ack'ed sequence numbers into a packet
     bool hasSequenceNumbersPendingAck() const;
