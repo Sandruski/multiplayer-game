@@ -84,7 +84,7 @@ void ReplicationManagerTransmissionData::onDeliverySuccess(DeliveryManager* deli
     }
 }
 
-void ReplicationManagerTransmissionData::onDeliveryFailure(DeliveryManager deliveryManager)
+void ReplicationManagerTransmissionData::onDeliveryFailure(DeliveryManager* deliveryManager)
 {
     for (const auto& replicationCommand : m_replicationCommands) {
     }

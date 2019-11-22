@@ -39,7 +39,7 @@ public:
     ~ReplicationManagerTransmissionData();
 
     void onDeliverySuccess(DeliveryManager* deliveryManager) override;
-    void onDeliveryFailure(DeliveryManager deliveryManager) override;
+    void onDeliveryFailure(DeliveryManager* deliveryManager) override;
 
     void AddTransmission(const ReplicationCommand& replicationCommand);
 

@@ -127,10 +127,12 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream& packet, c
         }
     }
 
-    OutputMemoryStream stream;
-    stream << ClientMessage::Ack;
-    m_deliveryManager.writeSequenceNumbersPendingAck(stream);
-    sendPacket(stream, fromAddress);
+    if (m_deliveryManager.hasSequenceNumbersPendingAck()) {
+        OutputMemoryStream stream;
+        stream << ClientMessage::Ack;
+        m_deliveryManager.writeSequenceNumbersPendingAck(stream);
+        sendPacket(stream, fromAddress);
+    }
 }
 
 void ModuleNetworkingClient::onUpdate()
