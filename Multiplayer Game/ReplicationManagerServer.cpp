@@ -25,7 +25,7 @@ void ReplicationManagerServer::destroy(uint32 networkID)
     m_replicationCommands.push_back(ReplicationCommand(ReplicationAction::Destroy, networkID));
 }
 
-void ReplicationManagerServer::write(OutputMemoryStream& packet)
+void ReplicationManagerServer::write(OutputMemoryStream& packet, ReplicationManagerTransmissionData* replicationManagerTransmissionData)
 {
     for (const auto& replicationCommand : m_replicationCommands) {
 
@@ -56,6 +56,8 @@ void ReplicationManagerServer::write(OutputMemoryStream& packet)
         }
         }
         }
+
+        replicationManagerTransmissionData->AddTransmission(replicationCommand);
     }
 
     m_replicationCommands.clear();
@@ -65,4 +67,30 @@ ReplicationCommand::ReplicationCommand(ReplicationAction action, uint32 networkI
     : m_action(action)
     , m_networkID(networkID)
 {
+}
+
+ReplicationManagerTransmissionData::ReplicationManagerTransmissionData(ReplicationManagerServer* replicationManager)
+    : m_replicationManager(replicationManager)
+{
+}
+
+ReplicationManagerTransmissionData::~ReplicationManagerTransmissionData()
+{
+}
+
+void ReplicationManagerTransmissionData::onDeliverySuccess(DeliveryManager* deliveryManager)
+{
+    for (const auto& replicationCommand : m_replicationCommands) {
+    }
+}
+
+void ReplicationManagerTransmissionData::onDeliveryFailure(DeliveryManager deliveryManager)
+{
+    for (const auto& replicationCommand : m_replicationCommands) {
+    }
+}
+
+void ReplicationManagerTransmissionData::AddTransmission(const ReplicationCommand& replicationCommand)
+{
+    m_replicationCommands.push_back(replicationCommand);
 }

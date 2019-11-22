@@ -120,7 +120,7 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream& packet, c
                 welcomePacket << proxy->gameObject->networkId;
                 sendPacket(welcomePacket, fromAddress);
 
-				proxy->lastPacketReceivedTime = Time.time;
+                proxy->lastPacketReceivedTime = Time.time;
 
                 // Send all network objects to the new player
                 uint16 networkGameObjectsCount;
@@ -130,10 +130,9 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream& packet, c
                     GameObject* gameObject = networkGameObjects[i];
 
                     // TODO(jesus): Notify the new client proxy's replication manager about the creation of this game object
-					if (gameObject != playerGameObject)
-					{
-						proxy->m_replicationManager.create(gameObject->networkId);
-					}
+                    if (gameObject != playerGameObject) {
+                        proxy->m_replicationManager.create(gameObject->networkId);
+                    }
                 }
 
                 LOG("Message received: hello - from player %s", playerName.c_str());
@@ -167,12 +166,11 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream& packet, c
                     }
                 }
             }
-		}
-		else if (message == ClientMessage::Ping) {
-			if (proxy != nullptr) {
-				proxy->lastPacketReceivedTime = Time.time;
-			}
-		}
+        } else if (message == ClientMessage::Ping) {
+            if (proxy != nullptr) {
+                proxy->lastPacketReceivedTime = Time.time;
+            }
+        }
     }
 }
 
@@ -190,10 +188,13 @@ void ModuleNetworkingServer::onUpdate()
                 // TODO(jesus): If the replication interval passed and the replication manager of this proxy
                 //              has pending data, write and send a replication packet to this client.
                 if (clientProxy.secondsSinceLastReplication >= replicationDeliveryIntervalSeconds) {
-					// Send InputExpectedSequenceNumber
-					packet.Write(clientProxy.nextExpectedInputSequenceNumber);
-
-                    clientProxy.m_replicationManager.write(packet);
+                    // Send InputExpectedSequenceNumber
+                    packet.Write(clientProxy.nextExpectedInputSequenceNumber);
+                    Delivery* delivery = clientProxy.m_deliveryManager.writeSequenceNumber(packet);
+                    ReplicationManagerTransmissionData* replicationManagerTransmissionData = new ReplicationManagerTransmissionData(&clientProxy.m_replicationManager);
+                    clientProxy.m_replicationManager.write(packet, replicationManagerTransmissionData);
+                    delivery->dispatchTime = Time.time;
+                    delivery->delegate = replicationManagerTransmissionData;
                     sendPacket(packet, clientProxy.address);
 
                     clientProxy.secondsSinceLastReplication = 0.0f;
@@ -207,13 +208,13 @@ void ModuleNetworkingServer::onUpdate()
                     sendPacket(packet.GetBufferPtr(), packet.GetSize(), clientProxy.address);
                 }
 
-				if (Time.time - clientProxy.lastPacketReceivedTime >= DISCONNECT_TIMEOUT_SECONDS)
-					onConnectionReset(clientProxy.address);
+                if (Time.time - clientProxy.lastPacketReceivedTime >= DISCONNECT_TIMEOUT_SECONDS)
+                    onConnectionReset(clientProxy.address);
             }
         }
-		if (secondsSinceLastPing >= PING_INTERVAL_SECONDS) {
-			secondsSinceLastPing = 0.0f;
-		}
+        if (secondsSinceLastPing >= PING_INTERVAL_SECONDS) {
+            secondsSinceLastPing = 0.0f;
+        }
     }
 }
 

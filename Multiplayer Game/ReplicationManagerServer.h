@@ -16,6 +16,8 @@ public:
     uint32 m_networkID;
 };
 
+class ReplicationManagerTransmissionData;
+
 class ReplicationManagerServer {
 public:
     ReplicationManagerServer();
@@ -25,8 +27,23 @@ public:
     void update(uint32 networkID);
     void destroy(uint32 networkID);
 
-    void write(OutputMemoryStream& packet);
+    void write(OutputMemoryStream& packet, ReplicationManagerTransmissionData* replicationManagerTransmissionData);
 
 private:
+    std::vector<ReplicationCommand> m_replicationCommands;
+};
+
+class ReplicationManagerTransmissionData : public DeliveryDelegate {
+public:
+    ReplicationManagerTransmissionData(ReplicationManagerServer* replicationManager);
+    ~ReplicationManagerTransmissionData();
+
+    void onDeliverySuccess(DeliveryManager* deliveryManager) override;
+    void onDeliveryFailure(DeliveryManager deliveryManager) override;
+
+    void AddTransmission(const ReplicationCommand& replicationCommand);
+
+private:
+    ReplicationManagerServer* m_replicationManager;
     std::vector<ReplicationCommand> m_replicationCommands;
 };
