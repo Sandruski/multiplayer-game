@@ -1,7 +1,14 @@
 #include "DeliveryManager.h"
 #include "Networks.h"
 
-#define ACK_TIMEOUT 0.3f
+DeliveryManager::DeliveryManager()
+{
+}
+
+DeliveryManager::~DeliveryManager()
+{
+	clear();
+}
 
 Delivery* DeliveryManager::writeSequenceNumber(OutputMemoryStream& packet)
 {
@@ -32,9 +39,11 @@ bool DeliveryManager::hasSequenceNumbersPendingAck() const
 
 void DeliveryManager::writeSequenceNumbersPendingAck(OutputMemoryStream& packet)
 {
-    packet.Write(m_pendingAcks.size());
-    for (const auto& sequenceNumber : m_pendingAcks) {
-        packet.Write(sequenceNumber);
+    std::size_t size = m_pendingAcks.size();
+    packet.Write(size);
+    if (size > 0) {
+        uint32 firstSequenceNumber = m_pendingAcks.front();
+        packet.Write(firstSequenceNumber);
     }
 }
 
@@ -42,32 +51,35 @@ void DeliveryManager::processAckSequenceNumbers(const InputMemoryStream& packet)
 {
     std::size_t size;
     packet.Read(size);
-    for (uint32 i = 0; i < size; ++i) {
-        uint32 sequenceNumber;
-        packet.Read(sequenceNumber);
+    if (size > 0) {
+        uint32 firstSequenceNumber;
+        packet.Read(firstSequenceNumber);
 
-        /*
-        const Delivery& delivery = m_deliveries.front();
-        SequenceNumber inFlightPacketSequenceNumber = delivery.GetSequenceNumber();
-        if (inFlightPacketSequenceNumber >= sequenceNumber) {
-            HandleDeliverySuccess(delivery);
-            m_deliveries.pop_front();
-            sequenceNumber = inFlightPacketSequenceNumber + 1;
-        } else if (inFlightPacketSequenceNumber < sequenceNumber) {
-            HandleDeliveryFailure(delivery);
-            m_deliveries.pop_front();
+        uint32 lastSequenceNumber = firstSequenceNumber + static_cast<uint32>(size) - 1;
+        while (firstSequenceNumber < lastSequenceNumber
+            && !m_pendingDeliveries.empty()) {
+            Delivery* delivery = m_pendingDeliveries.front();
+            uint32 deliverySequenceNumber = delivery->sequenceNumber;
+            if (deliverySequenceNumber >= m_nextExpectedSequenceNumber) {
+                delivery->delegate->onDeliverySuccess(this);
+                m_nextExpectedSequenceNumber = deliverySequenceNumber + 1;
+            } else {
+                delivery->delegate->onDeliveryFailure(this);
+            }
+			RELEASE(delivery);
+            m_pendingDeliveries.pop_front();
         }
-		*/
     }
 }
 
 void DeliveryManager::processTimedOutPackets()
 {
-    float timeout = Time.time - ACK_TIMEOUT;
+    float timeout = static_cast<float>(Time.time) - ACK_INTERVAL_SECONDS;
     while (!m_pendingDeliveries.empty()) {
         Delivery* delivery = m_pendingDeliveries.front();
         if (delivery->dispatchTime < timeout) {
             delivery->delegate->onDeliveryFailure(this);
+			RELEASE(delivery);
             m_pendingDeliveries.pop_front();
         } else {
             break;
@@ -77,6 +89,12 @@ void DeliveryManager::processTimedOutPackets()
 
 void DeliveryManager::clear()
 {
+	while (!m_pendingDeliveries.empty())
+	{
+		RELEASE(m_pendingDeliveries.front());
+		m_pendingDeliveries.pop_front();
+	}
+
     m_pendingDeliveries.clear();
     m_pendingAcks.clear();
 }
@@ -88,4 +106,5 @@ Delivery::Delivery(uint32 sequenceNumber)
 
 Delivery::~Delivery()
 {
+	RELEASE(delegate);
 }

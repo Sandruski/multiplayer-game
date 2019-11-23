@@ -37,12 +37,14 @@ inline float fractionalPart(float number)
 
 struct vec2
 {
+#pragma warning(disable : 4201)
 	union
 	{
 		struct { float x; float y; };
 		struct { float u; float v; };
 		float coords[2] = {};
 	};
+#pragma warning(default : 4201)
 };
 
 vec2 operator+(vec2 a, vec2 b) { return vec2{ a.x + b.x, a.y + b.y }; }
@@ -81,12 +83,14 @@ vec2 vec2FromDegrees(float degrees) {
 
 struct vec4
 {
+#pragma warning(disable : 4201)
 	union
 	{
 		struct { float x; float y; float z; float w; };
 		struct { float r; float g; float b; float a; };
 		float coords[4] = {};
 	};
+#pragma warning(default : 4201)
 };
 
 vec4 operator+(vec4 a, vec4 b) { return vec4{ a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w }; }
@@ -111,6 +115,7 @@ bool isZero(vec4 a) { return dot(a, a) < FLT_EPSILON; }
 
 struct mat4
 {
+#pragma warning(disable : 4201)
 	union
 	{
 		struct
@@ -122,6 +127,7 @@ struct mat4
 		};
 		float data[4][4];
 	};
+#pragma warning(default : 4201)
 };
 
 mat4 identity()

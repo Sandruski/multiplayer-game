@@ -21,6 +21,7 @@
 
 #define ArrayCount(Array) (sizeof(Array) / sizeof((Array)[0]))
 
+#define RELEASE(x) if (x != nullptr) { delete x; } x = nullptr; 
 
 ////////////////////////////////////////////////////////////////////////
 // CONSTANTS
@@ -41,7 +42,7 @@
 #define PACKET_DELIVERY_TIMEOUT_SECONDS                 0.5f
 #define PACKET_SIZE                             Kilobytes(10) // 4
 #define PING_INTERVAL_SECONDS                           0.5f
-
+#define ACK_INTERVAL_SECONDS 0.3f
 
 ////////////////////////////////////////////////////////////////////////
 // BASIC TYPES
@@ -125,6 +126,7 @@ struct InputController
 	float verticalAxis = 0.0f;
 	float horizontalAxis = 0.0f;
 
+#pragma warning(disable : 4201)
 	union
 	{
 		ButtonState buttons[8] = {};
@@ -140,6 +142,7 @@ struct InputController
 			ButtonState start;
 		};
 	};
+#pragma warning(default : 4201)
 };
 
 // NOTE(jesus): Global object to access the input controller

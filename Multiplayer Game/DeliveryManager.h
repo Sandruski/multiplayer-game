@@ -19,6 +19,9 @@ struct Delivery {
 
 class DeliveryManager {
 public:
+	DeliveryManager();
+	~DeliveryManager();
+
     // For senders to write a new sequence number into a packet
     Delivery* writeSequenceNumber(OutputMemoryStream& packet);
     // For receivers to process the sequence number from an incoming packet
