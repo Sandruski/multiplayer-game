@@ -21,8 +21,10 @@ Delivery* DeliveryManager::writeSequenceNumber(OutputMemoryStream& packet)
     return delivery;
 }
 
-bool DeliveryManager::processSequenceNumber(uint32 sequenceNumber)
+bool DeliveryManager::processSequenceNumber(const InputMemoryStream& packet)
 {
+	uint32 sequenceNumber;
+	packet.Read(sequenceNumber);
     if (sequenceNumber >= m_nextExpectedSequenceNumber) {
         m_pendingAcks.push_back(sequenceNumber);
         m_nextExpectedSequenceNumber = sequenceNumber + 1;

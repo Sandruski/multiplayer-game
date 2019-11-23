@@ -120,7 +120,7 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream& packet, c
         else if (message == ServerMessage::Replication) {
             uint32 sequenceNumber;
             packet.Read(sequenceNumber);
-            if (m_deliveryManager.processSequenceNumber(sequenceNumber)) {
+            if (m_deliveryManager.processSequenceNumber(packet)) {
                 inputDataFront = sequenceNumber;
                 m_replicationManager.read(packet);
 
