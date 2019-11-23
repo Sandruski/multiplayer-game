@@ -62,11 +62,6 @@ void ReplicationManagerServer::write(OutputMemoryStream& packet, ReplicationMana
         case ReplicationAction::Create: {
         case ReplicationAction::Update: {
 			GameObject* gameObject = App->modLinkingContext->getNetworkGameObject(networkID);
-			if (gameObject == nullptr)
-			{
-				continue;
-			}
-
 			packet.Write(networkID);
 			packet.Write(replicationAction);
 			gameObject->write(packet);			
