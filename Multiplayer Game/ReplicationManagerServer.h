@@ -32,6 +32,8 @@ public:
 
     void write(OutputMemoryStream& packet, ReplicationManagerTransmissionData* replicationManagerTransmissionData);
 
+	void writeCreateOrUpdate(OutputMemoryStream& packet, uint32 networkID);
+
 private:
     std::vector<ReplicationCommand> m_replicationCommands;
 };

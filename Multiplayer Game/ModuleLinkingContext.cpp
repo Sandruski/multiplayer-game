@@ -34,9 +34,16 @@ GameObject * ModuleLinkingContext::getNetworkGameObject(uint32 networkId)
 
 	GameObject *gameObject = networkGameObjects[arrayIndex];
 
-	if (gameObject != nullptr && gameObject->networkId == networkId)
+	if (gameObject != nullptr)
 	{
-		return gameObject;
+		if (gameObject->networkId == networkId)
+		{
+			return gameObject;
+		}
+		else
+		{
+			return nullptr;
+		}
 	}
 	else
 	{

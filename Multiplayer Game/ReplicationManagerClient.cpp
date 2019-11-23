@@ -12,22 +12,17 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet)
 
         switch (action) {
         case ReplicationAction::Create: {
-            GameObject* gameObject = App->modGameObject->Instantiate();
-            App->modLinkingContext->registerNetworkGameObjectWithNetworkId(gameObject, networkID);
-            gameObject->read(packet);
+			create(packet, networkID);
             break;
         }
 
         case ReplicationAction::Update: {
-            GameObject* gameObject = App->modLinkingContext->getNetworkGameObject(networkID);
-            gameObject->read(packet);
+			update(packet, networkID);
             break;
         }
 
         case ReplicationAction::Destroy: {
-            GameObject* gameObject = App->modLinkingContext->getNetworkGameObject(networkID);
-            App->modLinkingContext->unregisterNetworkGameObject(gameObject);
-            App->modGameObject->Destroy(gameObject);
+			destroy(networkID);
             break;
         }
 
@@ -36,4 +31,36 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet)
         }
         }
     }
+}
+
+void ReplicationManagerClient::create(const InputMemoryStream& packet, uint32 networkID) const
+{
+	GameObject* gameObject = App->modLinkingContext->getNetworkGameObject(networkID);
+	if (gameObject == nullptr)
+	{
+		GameObject* newGameObject = App->modGameObject->Instantiate();
+		App->modLinkingContext->registerNetworkGameObjectWithNetworkId(newGameObject, networkID);
+		gameObject = newGameObject;
+	}
+
+	gameObject->read(packet);
+}
+
+void ReplicationManagerClient::update(const InputMemoryStream& packet, uint32 networkID) const
+{
+	GameObject* gameObject = App->modLinkingContext->getNetworkGameObject(networkID);
+	if (gameObject != nullptr)
+	{
+		gameObject->read(packet);
+	}
+}
+
+void ReplicationManagerClient::destroy(uint32 networkID) const
+{
+	GameObject* gameObject = App->modLinkingContext->getNetworkGameObject(networkID);
+	if (gameObject != nullptr)
+	{
+		App->modLinkingContext->unregisterNetworkGameObject(gameObject);
+		App->modGameObject->Destroy(gameObject);
+	}
 }
