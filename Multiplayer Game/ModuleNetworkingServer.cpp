@@ -186,14 +186,13 @@ void ModuleNetworkingServer::onUpdate()
         // Replication
         for (ClientProxy& clientProxy : clientProxies) {
             if (clientProxy.connected) {
-                OutputMemoryStream packet;
-                packet << ServerMessage::Replication;
-
                 // TODO(jesus): If the replication interval passed and the replication manager of this proxy
                 //              has pending data, write and send a replication packet to this client.
                 if (clientProxy.secondsSinceLastReplication >= replicationDeliveryIntervalSeconds) {
                     // Send InputExpectedSequenceNumber
-                    packet.Write(clientProxy.nextExpectedInputSequenceNumber);
+					OutputMemoryStream packet;
+					packet << ServerMessage::Replication;
+					packet.Write(clientProxy.nextExpectedInputSequenceNumber);
                     Delivery* delivery = clientProxy.m_deliveryManager.writeSequenceNumber(packet);
                     ReplicationManagerTransmissionData* replicationManagerTransmissionData = new ReplicationManagerTransmissionData(&clientProxy.m_replicationManager);
                     clientProxy.m_replicationManager.write(packet, replicationManagerTransmissionData);
