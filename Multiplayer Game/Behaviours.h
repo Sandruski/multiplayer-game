@@ -7,7 +7,7 @@ struct Behaviour {
 
     virtual void update() { }
 
-    virtual void onInput(const InputController& input) { }
+    virtual void onInput(const InputController& input, bool isClient = false) { }
 
     virtual void onCollisionTriggered(Collider& c1, Collider& c2) { }
 };
@@ -18,21 +18,21 @@ struct Spaceship : public Behaviour {
         gameObject->tag = (uint32)(Random.next() * UINT_MAX);
     }
 
-    void onInput(const InputController& input) override
+    void onInput(const InputController& input, bool isClient = false) override
     {
         if (input.horizontalAxis != 0.0f) {
             const float rotateSpeed = 180.0f;
             gameObject->angle += input.horizontalAxis * rotateSpeed * Time.deltaTime;
-            NetworkUpdate(gameObject);
+            isClient ? void() : NetworkUpdate(gameObject);
         }
 
         if (input.actionDown == ButtonState::Pressed) {
             const float advanceSpeed = 200.0f;
             gameObject->position += vec2FromDegrees(gameObject->angle) * advanceSpeed * Time.deltaTime;
-            NetworkUpdate(gameObject);
+			isClient ? void() : NetworkUpdate(gameObject);
         }
 
-        if (input.actionLeft == ButtonState::Press) {
+        if (!isClient && input.actionLeft == ButtonState::Press) {
             GameObject* laser = App->modNetServer->spawnBullet(gameObject);
             laser->tag = gameObject->tag;
         }
