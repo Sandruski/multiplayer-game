@@ -54,6 +54,7 @@ private:
 
     void releaseComponents();
     friend class ModuleGameObject;
+	friend class ReplicationManagerClient;
 };
 
 class ModuleGameObject : public Module {

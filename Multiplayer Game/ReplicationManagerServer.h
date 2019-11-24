@@ -23,9 +23,6 @@ public:
     ReplicationManagerServer();
     ~ReplicationManagerServer();
 
-	void removeFromReplication(uint32 networkID);
-	void handleCreateAckd(uint32 networkID);
-
     void create(uint32 networkID);
     void update(uint32 networkID);
     void destroy(uint32 networkID);
@@ -45,9 +42,6 @@ public:
 
     void onDeliverySuccess(DeliveryManager* deliveryManager) override;
     void onDeliveryFailure(DeliveryManager* deliveryManager) override;
-
-	void HandleCreateDeliverySuccess(uint32 networkID) const;
-	void HandleDestroyDeliverySuccess(uint32 networkID) const;
 
 	void HandleCreateDeliveryFailure(uint32 networkID) const;
 	void HandleDestroyDeliveryFailure(uint32 networkID) const;

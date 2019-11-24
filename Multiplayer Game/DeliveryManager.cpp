@@ -99,6 +99,9 @@ void DeliveryManager::clear()
 
     m_pendingDeliveries.clear();
     m_pendingAcks.clear();
+
+	m_nextOutgoingSequenceNumber = 0;
+	m_nextExpectedSequenceNumber = 0;
 }
 
 Delivery::Delivery(uint32 sequenceNumber)

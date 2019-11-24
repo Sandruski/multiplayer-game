@@ -10,6 +10,8 @@ public:
 
 	GameObject *getNetworkGameObject(uint32 networkId);
 
+	GameObject* getNetworkGameObjectUnsafe(uint32 networkId);
+
 	void getNetworkGameObjects(GameObject *gameObjects[MAX_NETWORK_OBJECTS], uint16 *count);
 
 	uint16 getNetworkGameObjectsCount() const;
