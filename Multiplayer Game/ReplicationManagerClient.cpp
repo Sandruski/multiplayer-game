@@ -57,9 +57,9 @@ void ReplicationManagerClient::update(const InputMemoryStream& packet, uint32 ne
 	GameObject* gameObject = App->modLinkingContext->getNetworkGameObject(networkID);
 	if (gameObject == nullptr)
 	{
-		GameObject* go = new GameObject();
-		go->read(packet);
-		delete go;
+		GameObject auxGameObject;
+		auxGameObject.read(packet);
+		auxGameObject.releaseComponents();
 	}
 	else
 	{
