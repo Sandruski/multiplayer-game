@@ -132,7 +132,7 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream& packet, c
 					unpackInputControllerButtons(inputPacketData.buttonBits, controller);
 					GameObject* playerGameObject = App->modLinkingContext->getNetworkGameObject(networkId);
 					if (playerGameObject != nullptr) {
-						//playerGameObject->behaviour->onInput(controller);
+						playerGameObject->behaviour->onInput(controller, true);
 					}
 				}
             }
@@ -176,7 +176,7 @@ void ModuleNetworkingClient::onUpdate()
 
 			GameObject* playerGameObject = App->modLinkingContext->getNetworkGameObject(networkId);
 			if (playerGameObject != nullptr) {
-				//playerGameObject->behaviour->onInput(Input);
+				playerGameObject->behaviour->onInput(Input, true);
 			}
 
             inputPacketData.buttonBits = packInputControllerButtons(Input);
