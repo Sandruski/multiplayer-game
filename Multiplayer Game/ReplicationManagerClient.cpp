@@ -38,9 +38,8 @@ void ReplicationManagerClient::create(const InputMemoryStream& packet, uint32 ne
 	GameObject* gameObject = App->modLinkingContext->getNetworkGameObject(networkID);
 	if (gameObject == nullptr)
 	{
-		GameObject* newGameObject = App->modGameObject->Instantiate();
-		App->modLinkingContext->registerNetworkGameObjectWithNetworkId(newGameObject, networkID);
-		gameObject = newGameObject;
+		gameObject = App->modGameObject->Instantiate();
+		App->modLinkingContext->registerNetworkGameObjectWithNetworkId(gameObject, networkID);
 	}
 
 	gameObject->read(packet);
@@ -49,10 +48,7 @@ void ReplicationManagerClient::create(const InputMemoryStream& packet, uint32 ne
 void ReplicationManagerClient::update(const InputMemoryStream& packet, uint32 networkID) const
 {
 	GameObject* gameObject = App->modLinkingContext->getNetworkGameObject(networkID);
-	if (gameObject != nullptr)
-	{
-		gameObject->read(packet);
-	}
+	gameObject->read(packet);
 }
 
 void ReplicationManagerClient::destroy(uint32 networkID) const

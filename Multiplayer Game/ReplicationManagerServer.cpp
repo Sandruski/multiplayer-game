@@ -39,6 +39,15 @@ void ReplicationManagerServer::handleCreateAckd(uint32 networkID)
 
 void ReplicationManagerServer::create(uint32 networkID)
 {
+	for (auto& replicationCommand : m_replicationCommands)
+	{
+		if (replicationCommand.m_networkID == networkID)
+		{
+			replicationCommand.m_action = ReplicationAction::Create;
+			return;
+		}
+	}
+
     m_replicationCommands.push_back(ReplicationCommand(ReplicationAction::Create, networkID));
 }
 
@@ -54,7 +63,7 @@ void ReplicationManagerServer::destroy(uint32 networkID)
 		if (replicationCommand.m_networkID == networkID)
 		{
 			replicationCommand.m_action = ReplicationAction::Destroy;
-			break;
+			return;
 		}
 	}
 }
