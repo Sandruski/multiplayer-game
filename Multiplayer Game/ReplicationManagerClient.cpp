@@ -38,6 +38,13 @@ void ReplicationManagerClient::create(const InputMemoryStream& packet, uint32 ne
 	GameObject* gameObject = App->modLinkingContext->getNetworkGameObject(networkID);
 	if (gameObject == nullptr)
 	{
+		gameObject = App->modLinkingContext->getNetworkGameObjectUnsafe(networkID);
+		if (gameObject != nullptr)
+		{
+			App->modLinkingContext->unregisterNetworkGameObject(gameObject);
+			Destroy(gameObject);
+		}
+
 		gameObject = App->modGameObject->Instantiate();
 		App->modLinkingContext->registerNetworkGameObjectWithNetworkId(gameObject, networkID);
 	}
@@ -48,7 +55,16 @@ void ReplicationManagerClient::create(const InputMemoryStream& packet, uint32 ne
 void ReplicationManagerClient::update(const InputMemoryStream& packet, uint32 networkID) const
 {
 	GameObject* gameObject = App->modLinkingContext->getNetworkGameObject(networkID);
-	gameObject->read(packet);
+	if (gameObject == nullptr)
+	{
+		GameObject* go = new GameObject();
+		go->read(packet);
+		delete go;
+	}
+	else
+	{
+		gameObject->read(packet);
+	}
 }
 
 void ReplicationManagerClient::destroy(uint32 networkID) const
@@ -57,6 +73,6 @@ void ReplicationManagerClient::destroy(uint32 networkID) const
 	if (gameObject != nullptr)
 	{
 		App->modLinkingContext->unregisterNetworkGameObject(gameObject);
-		App->modGameObject->Destroy(gameObject);
+		Destroy(gameObject);
 	}
 }

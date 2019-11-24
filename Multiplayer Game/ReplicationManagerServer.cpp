@@ -78,9 +78,12 @@ void ReplicationManagerServer::write(OutputMemoryStream& packet, ReplicationMana
 		packet.Write(replicationAction);
 
         switch (replicationAction) {
-        case ReplicationAction::Create: {
+		case ReplicationAction::Create: {
+			writeCreate(packet, networkID);
+			break;
+		}
         case ReplicationAction::Update: {
-			writeCreateOrUpdate(packet, networkID);
+			writeUpdate(packet, networkID);
             break;
         }
 
@@ -88,13 +91,18 @@ void ReplicationManagerServer::write(OutputMemoryStream& packet, ReplicationMana
             break;
         }
         }
-        }
 
         replicationManagerTransmissionData->AddTransmission(replicationCommand);
     }
 }
 
-void ReplicationManagerServer::writeCreateOrUpdate(OutputMemoryStream& packet, uint32 networkID)
+void ReplicationManagerServer::writeCreate(OutputMemoryStream& packet, uint32 networkID)
+{
+	GameObject* gameObject = App->modLinkingContext->getNetworkGameObject(networkID);
+	gameObject->write(packet);
+}
+
+void ReplicationManagerServer::writeUpdate(OutputMemoryStream& packet, uint32 networkID)
 {
 	GameObject* gameObject = App->modLinkingContext->getNetworkGameObject(networkID);
 	gameObject->write(packet);

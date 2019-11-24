@@ -37,8 +37,8 @@ public:
     void read(const InputMemoryStream& packet);
 
 private:
-    void* operator new(size_t size) = delete;
-    void operator delete(void* obj) = delete;
+    //void* operator new(size_t size) = delete;
+    //void operator delete(void* obj) = delete;
 
     void releaseComponents();
     friend class ModuleGameObject;

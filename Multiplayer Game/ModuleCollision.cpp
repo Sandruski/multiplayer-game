@@ -93,6 +93,9 @@ bool ModuleCollision::update()
         }
     }
 
+	if (App->modNetClient->isEnabled())
+		return true;
+
     // Traverse all active colliders
     for (uint32 i = 0; i < activeCollidersCount; ++i) {
         Collider& c1 = *activeColliders[i];
