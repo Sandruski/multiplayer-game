@@ -127,12 +127,12 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream& packet, c
 				for (uint32 i = inputDataFront; i < inputDataBack; ++i) {
 					InputPacketData& inputPacketData = inputData[i % ArrayCount(inputData)];
 					InputController controller;
-					Input.horizontalAxis = inputPacketData.horizontalAxis;
-					Input.horizontalAxis = inputPacketData.verticalAxis;
+					controller.horizontalAxis = inputPacketData.horizontalAxis;
+					controller.horizontalAxis = inputPacketData.verticalAxis;
 					unpackInputControllerButtons(inputPacketData.buttonBits, controller);
 					GameObject* playerGameObject = App->modLinkingContext->getNetworkGameObject(networkId);
 					if (playerGameObject != nullptr) {
-						//playerGameObject->behaviour->onInput(Input);
+						//playerGameObject->behaviour->onInput(controller);
 					}
 				}
             }
@@ -173,12 +173,13 @@ void ModuleNetworkingClient::onUpdate()
             inputPacketData.sequenceNumber = currentInputData;
             inputPacketData.horizontalAxis = Input.horizontalAxis;
             inputPacketData.verticalAxis = Input.verticalAxis;
-            inputPacketData.buttonBits = packInputControllerButtons(Input);
 
 			GameObject* playerGameObject = App->modLinkingContext->getNetworkGameObject(networkId);
 			if (playerGameObject != nullptr) {
 				//playerGameObject->behaviour->onInput(Input);
 			}
+
+            inputPacketData.buttonBits = packInputControllerButtons(Input);
 
             // Create packet (if there's input and the input delivery interval exceeded)
             if (secondsSinceLastInputDelivery > inputDeliveryIntervalSeconds) {
