@@ -13,6 +13,8 @@ public:
 
     void setPlayerInfo(const char* playerName, uint8 spaceshipType);
 
+	uint32 GetSpaceshipNetworkID() { return networkId; }
+
 private:
     //////////////////////////////////////////////////////////////////////
     // ModuleNetworking virtual methods

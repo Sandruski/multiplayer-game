@@ -35,11 +35,19 @@ void GameObject::write(OutputMemoryStream& packet) const
 
 void GameObject::read(const InputMemoryStream& packet)
 {
-	// set interpolation values
-	interpolation.secondsElapsed = 0.0f;
-	interpolation.initialPosition = position;
-    packet.Read(interpolation.finalPosition.x);
-    packet.Read(interpolation.finalPosition.y);
+	if (!isClientSS)
+	{
+		// set interpolation values
+		interpolation.secondsElapsed = 0.0f;
+		interpolation.initialPosition = position;
+		packet.Read(interpolation.finalPosition.x);
+		packet.Read(interpolation.finalPosition.y);
+	}
+	else
+	{
+		packet.Read(position.x);
+		packet.Read(position.y);
+	}
 
     // Render component
     packet.Read(pivot.x);
@@ -147,7 +155,15 @@ bool ModuleGameObject::preUpdate()
 bool ModuleGameObject::update()
 {
 	if (App->modNetClient->isEnabled())
+	{
+		for (GameObject& gameObject : gameObjects) {
+			if (gameObject.state == GameObject::UPDATING) {
+				if (gameObject.behaviour != nullptr)
+					gameObject.behaviour->updateClient();
+			}
+		}
 		return true;
+	}
 
     for (GameObject& gameObject : gameObjects) {
         if (gameObject.state == GameObject::UPDATING) {
@@ -155,8 +171,6 @@ bool ModuleGameObject::update()
                 gameObject.behaviour->update();
         }
     }
-
-
 
     return true;
 }

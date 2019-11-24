@@ -47,6 +47,9 @@ void ReplicationManagerClient::create(const InputMemoryStream& packet, uint32 ne
 
 		gameObject = App->modGameObject->Instantiate();
 		App->modLinkingContext->registerNetworkGameObjectWithNetworkId(gameObject, networkID);
+
+		if (gameObject->networkId == App->modNetClient->GetSpaceshipNetworkID())
+			gameObject->isClientSS = true;
 	}
 
 	gameObject->read(packet);
