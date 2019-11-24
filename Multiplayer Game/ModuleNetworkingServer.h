@@ -11,6 +11,8 @@ public:
 
     void setListenPort(int port);
 
+	void disconnectClient(GameObject* gameObject);
+
 private:
     //////////////////////////////////////////////////////////////////////
     // ModuleNetworking virtual methods

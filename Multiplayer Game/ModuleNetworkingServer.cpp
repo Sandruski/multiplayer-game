@@ -10,6 +10,16 @@ void ModuleNetworkingServer::setListenPort(int port)
     listenPort = port;
 }
 
+void ModuleNetworkingServer::disconnectClient(GameObject* gameObject)
+{
+	for (int i = 0; i < MAX_CLIENTS; ++i) {
+		if (clientProxies[i].connected && clientProxies[i].gameObject == gameObject) {
+			onConnectionReset(clientProxies[i].address);
+			return;
+		}
+	}
+}
+
 //////////////////////////////////////////////////////////////////////
 // ModuleNetworking virtual methods
 //////////////////////////////////////////////////////////////////////
@@ -171,10 +181,14 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream& packet, c
                 proxy->lastPacketReceivedTime = Time.time;
             }
         } else if (message == ClientMessage::Ack) {
-            proxy->m_deliveryManager.processAckSequenceNumbers(packet);
+			if (proxy != nullptr) {
+				proxy->m_deliveryManager.processAckSequenceNumbers(packet);
+			}
         }
 
-        proxy->m_deliveryManager.processTimedOutPackets();
+		if (proxy != nullptr) {
+			proxy->m_deliveryManager.processTimedOutPackets();
+		}
     }
 }
 

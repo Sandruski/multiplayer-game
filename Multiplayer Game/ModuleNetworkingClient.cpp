@@ -236,6 +236,8 @@ void ModuleNetworkingClient::onDisconnect()
     App->modLinkingContext->getNetworkGameObjects(networkGameObjects, &networkGameObjectsCount);
     App->modLinkingContext->clear();
 
+	m_deliveryManager.clear();
+
     // Destroy all network objects
     for (uint32 i = 0; i < networkGameObjectsCount; ++i) {
         Destroy(networkGameObjects[i]);
