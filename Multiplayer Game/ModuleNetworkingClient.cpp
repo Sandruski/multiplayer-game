@@ -121,9 +121,9 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream& packet, c
             uint32 nextExpectedInputSequenceNumber;
             packet.Read(nextExpectedInputSequenceNumber);
             if (m_deliveryManager.processSequenceNumber(packet)) {
-                inputDataFront = nextExpectedInputSequenceNumber;
                 m_replicationManager.read(packet);
 
+				inputDataFront = nextExpectedInputSequenceNumber;
 				for (uint32 i = inputDataFront; i < inputDataBack; ++i) {
 					InputPacketData& inputPacketData = inputData[i % ArrayCount(inputData)];
 					InputController controller;

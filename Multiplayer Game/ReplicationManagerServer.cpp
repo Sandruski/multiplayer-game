@@ -17,6 +17,7 @@ void ReplicationManagerServer::removeFromReplication(uint32 networkID)
 		if ((*it).m_networkID == networkID)
 		{
 			m_replicationCommands.erase(it);
+			break;
 		}
 	}
 }
@@ -43,12 +44,19 @@ void ReplicationManagerServer::create(uint32 networkID)
 
 void ReplicationManagerServer::update(uint32 networkID)
 {
-    m_replicationCommands.push_back(ReplicationCommand(ReplicationAction::Update, networkID));
+	// handleCreateAckd does the job
 }
 
 void ReplicationManagerServer::destroy(uint32 networkID)
 {
-    m_replicationCommands.push_back(ReplicationCommand(ReplicationAction::Destroy, networkID));
+	for (auto& replicationCommand : m_replicationCommands)
+	{
+		if (replicationCommand.m_networkID == networkID)
+		{
+			replicationCommand.m_action = ReplicationAction::Destroy;
+			break;
+		}
+	}
 }
 
 void ReplicationManagerServer::write(OutputMemoryStream& packet, ReplicationManagerTransmissionData* replicationManagerTransmissionData)
@@ -56,24 +64,16 @@ void ReplicationManagerServer::write(OutputMemoryStream& packet, ReplicationMana
     for (const auto& replicationCommand : m_replicationCommands) {
 
         uint32 networkID = replicationCommand.m_networkID;
+		packet.Write(networkID);
         ReplicationAction replicationAction = replicationCommand.m_action;
+		packet.Write(replicationAction);
 
         switch (replicationAction) {
         case ReplicationAction::Create: {
         case ReplicationAction::Update: {
-			GameObject* gameObject = App->modLinkingContext->getNetworkGameObject(networkID);
-			packet.Write(networkID);
-			packet.Write(replicationAction);
-			gameObject->write(packet);			
+			writeCreateOrUpdate(packet, networkID);
             break;
         }
-
-		case ReplicationAction::Destroy:
-		{
-			packet.Write(networkID);
-			packet.Write(replicationAction);
-			break;
-		}
 
         default: {
             break;
@@ -83,19 +83,12 @@ void ReplicationManagerServer::write(OutputMemoryStream& packet, ReplicationMana
 
         replicationManagerTransmissionData->AddTransmission(replicationCommand);
     }
-
-    m_replicationCommands.clear();
 }
 
 void ReplicationManagerServer::writeCreateOrUpdate(OutputMemoryStream& packet, uint32 networkID)
 {
 	GameObject* gameObject = App->modLinkingContext->getNetworkGameObject(networkID);
-	if (gameObject != nullptr)
-	{
-		packet.Write(networkID);
-		packet.Write(ReplicationAction::Create);
-		gameObject->write(packet);
-	}
+	gameObject->write(packet);
 }
 
 ReplicationCommand::ReplicationCommand(ReplicationAction action, uint32 networkID)
