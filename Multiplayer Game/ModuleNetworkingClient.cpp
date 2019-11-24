@@ -107,6 +107,8 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream& packet, c
             packet >> playerId;
             packet >> networkId;
 
+
+
             LOG("ModuleNetworkingClient::onPacketReceived() - Welcome from server");
             state = ClientState::Playing;
         } else if (message == ServerMessage::Unwelcome) {

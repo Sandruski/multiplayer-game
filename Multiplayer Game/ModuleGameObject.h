@@ -2,8 +2,20 @@
 
 struct GameObject {
 public:
+
     // Transform component
     vec2 position = vec2 { 0.0f, 0.0f };
+
+	struct
+	{
+		vec2 initialPosition = vec2{ 0.0f, 0.0f };
+		float initialAngle = 0.0f;
+
+		vec2  finalPosition = vec2{ 0.0f, 0.0f };
+		float finalAngle = 0.0f;
+
+		float secondsElapsed = 0.0f;
+	} interpolation;
 
     // Render component
     vec2 pivot = vec2 { 0.5f, 0.5f };

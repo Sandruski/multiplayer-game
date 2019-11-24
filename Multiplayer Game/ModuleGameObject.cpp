@@ -35,9 +35,11 @@ void GameObject::write(OutputMemoryStream& packet) const
 
 void GameObject::read(const InputMemoryStream& packet)
 {
-    // Transform component
-    packet.Read(position.x);
-    packet.Read(position.y);
+	// set interpolation values
+	interpolation.secondsElapsed = 0.0f;
+	interpolation.initialPosition = position;
+    packet.Read(interpolation.finalPosition.x);
+    packet.Read(interpolation.finalPosition.y);
 
     // Render component
     packet.Read(pivot.x);
@@ -153,6 +155,8 @@ bool ModuleGameObject::update()
                 gameObject.behaviour->update();
         }
     }
+
+
 
     return true;
 }
