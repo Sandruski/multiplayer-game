@@ -185,10 +185,6 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream& packet, c
 				proxy->m_deliveryManager.processAckSequenceNumbers(packet);
 			}
         }
-
-		if (proxy != nullptr) {
-			proxy->m_deliveryManager.processTimedOutPackets();
-		}
     }
 }
 
@@ -233,6 +229,11 @@ void ModuleNetworkingServer::onUpdate()
             secondsSinceLastPing = 0.0f;
         }
     }
+
+	for (auto& clientProxy : clientProxies)
+	{
+		clientProxy.m_deliveryManager.processTimedOutPackets();
+	}
 }
 
 void ModuleNetworkingServer::onConnectionReset(const sockaddr_in& fromAddress)

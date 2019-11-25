@@ -121,7 +121,10 @@ void ReplicationManagerTransmissionData::HandleCreateDeliveryFailure(uint32 netw
 
 void ReplicationManagerTransmissionData::HandleDestroyDeliveryFailure(uint32 networkID) const
 {
-	m_replicationManager->destroy(networkID);
+	if (App->modLinkingContext->getNetworkGameObject(networkID) == nullptr)
+	{
+		m_replicationManager->destroy(networkID);
+	}
 }
 
 void ReplicationManagerTransmissionData::AddTransmission(const ReplicationCommand& replicationCommand)

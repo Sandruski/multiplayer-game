@@ -68,8 +68,12 @@ void DeliveryManager::processAckSequenceNumbers(const InputMemoryStream& packet)
 				delivery->delegate->onDeliverySuccess(this);
 
 				RELEASE(delivery);
-				m_pendingDeliveries.erase(it);
-				break;
+				it = m_pendingDeliveries.erase(it);
+				if (it == m_pendingDeliveries.end())
+				{
+					break;
+				}
+				continue;
 			}
 		}
 	}
@@ -87,6 +91,10 @@ void DeliveryManager::processTimedOutPackets()
 
 			RELEASE(delivery);
 			it = m_pendingDeliveries.erase(it);
+			if (it == m_pendingDeliveries.end())
+			{
+				break;
+			}
 			continue;
         }
     }
