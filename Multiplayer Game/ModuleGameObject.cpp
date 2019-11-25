@@ -36,11 +36,12 @@ void GameObject::write(OutputMemoryStream& packet) const
 void GameObject::read(const InputMemoryStream& packet)
 {
 	// set interpolation values
-	interpolation.secondsElapsed = 0.0f;
-	interpolation.initialPosition = position;
-    packet.Read(interpolation.finalPosition.x);
-    packet.Read(interpolation.finalPosition.y);
-
+	//interpolation.secondsElapsed = 0.0f;
+	//interpolation.initialPosition = position;
+    //packet.Read(interpolation.finalPosition.x);
+    //packet.Read(interpolation.finalPosition.y);
+	packet.Read(position.x);
+	packet.Read(position.y);
     // Render component
     packet.Read(pivot.x);
     packet.Read(pivot.y);
