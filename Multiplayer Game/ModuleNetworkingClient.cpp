@@ -91,6 +91,8 @@ void ModuleNetworkingClient::onGui()
 
             ImGui::Text("Input:");
             ImGui::InputFloat("Delivery interval (s)", &inputDeliveryIntervalSeconds, 0.01f, 0.1f, 4);
+
+			ImGui::Checkbox("Client prediction", &bClientPrediction);
         }
     }
 }
@@ -126,15 +128,18 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream& packet, c
                 m_replicationManager.read(packet);
 
 				inputDataFront = nextExpectedInputSequenceNumber;
-				for (uint32 i = inputDataFront; i < inputDataBack; ++i) {
-					InputPacketData& inputPacketData = inputData[i % ArrayCount(inputData)];
-					InputController controller;
-					controller.horizontalAxis = inputPacketData.horizontalAxis;
-					controller.horizontalAxis = inputPacketData.verticalAxis;
-					unpackInputControllerButtons(inputPacketData.buttonBits, controller);
-					GameObject* playerGameObject = App->modLinkingContext->getNetworkGameObject(networkId);
-					if (playerGameObject != nullptr) {
-						playerGameObject->behaviour->onInput(controller, true);
+				if (bClientPrediction)
+				{
+					for (uint32 i = inputDataFront; i < inputDataBack; ++i) {
+						InputPacketData& inputPacketData = inputData[i % ArrayCount(inputData)];
+						InputController controller;
+						controller.horizontalAxis = inputPacketData.horizontalAxis;
+						controller.horizontalAxis = inputPacketData.verticalAxis;
+						unpackInputControllerButtons(inputPacketData.buttonBits, controller);
+						GameObject* playerGameObject = App->modLinkingContext->getNetworkGameObject(networkId);
+						if (playerGameObject != nullptr) {
+							playerGameObject->behaviour->onInput(controller, true);
+						}
 					}
 				}
             }
@@ -176,9 +181,12 @@ void ModuleNetworkingClient::onUpdate()
             inputPacketData.horizontalAxis = Input.horizontalAxis;
             inputPacketData.verticalAxis = Input.verticalAxis;
 
-			GameObject* playerGameObject = App->modLinkingContext->getNetworkGameObject(networkId);
-			if (playerGameObject != nullptr) {
-				playerGameObject->behaviour->onInput(Input, true);
+			if (bClientPrediction)
+			{
+				GameObject* playerGameObject = App->modLinkingContext->getNetworkGameObject(networkId);
+				if (playerGameObject != nullptr) {
+					playerGameObject->behaviour->onInput(Input, true);
+				}
 			}
 
             inputPacketData.buttonBits = packInputControllerButtons(Input);
