@@ -43,48 +43,51 @@ void DeliveryManager::writeSequenceNumbersPendingAck(OutputMemoryStream& packet)
 {
     std::size_t size = m_pendingAcks.size();
     packet.Write(size);
-    if (size > 0) {
-        uint32 firstSequenceNumber = m_pendingAcks.front();
-        packet.Write(firstSequenceNumber);
+	for (uint32 i = 0; i < size; ++i)
+	{
+        packet.Write(m_pendingAcks[i]);
     }
+
+	m_pendingAcks.clear();
 }
 
 void DeliveryManager::processAckSequenceNumbers(const InputMemoryStream& packet)
 {
     std::size_t size;
     packet.Read(size);
-    if (size > 0) {
-        uint32 firstSequenceNumber;
-        packet.Read(firstSequenceNumber);
+	for (uint32 i = 0; i < size; ++i)
+	{
+		uint32 sequenceNumber;
+		packet.Read(sequenceNumber);
 
-        uint32 lastSequenceNumber = firstSequenceNumber + static_cast<uint32>(size) - 1;
-        while (firstSequenceNumber < lastSequenceNumber
-            && !m_pendingDeliveries.empty()) {
-            Delivery* delivery = m_pendingDeliveries.front();
-            uint32 deliverySequenceNumber = delivery->sequenceNumber;
-            if (deliverySequenceNumber >= m_nextExpectedSequenceNumber) {
-                delivery->delegate->onDeliverySuccess(this);
-                m_nextExpectedSequenceNumber = deliverySequenceNumber + 1;
-            } else {
-                delivery->delegate->onDeliveryFailure(this);
-            }
-			RELEASE(delivery);
-            m_pendingDeliveries.pop_front();
-        }
-    }
+		for (auto it = m_pendingDeliveries.begin(); it != m_pendingDeliveries.end(); ++it)
+		{
+			Delivery* delivery = *it;
+			if (delivery->sequenceNumber == sequenceNumber)
+			{
+				delivery->delegate->onDeliverySuccess(this);
+
+				RELEASE(delivery);
+				m_pendingDeliveries.erase(it);
+				break;
+			}
+		}
+	}
 }
 
 void DeliveryManager::processTimedOutPackets()
 {
     float timeout = static_cast<float>(Time.time) - ACK_INTERVAL_SECONDS;
-    while (!m_pendingDeliveries.empty()) {
-        Delivery* delivery = m_pendingDeliveries.front();
-        if (delivery->dispatchTime < timeout) {
+	for (auto it = m_pendingDeliveries.begin(); it != m_pendingDeliveries.end(); ++it)
+	{
+		Delivery* delivery = *it;
+        if (delivery->dispatchTime < timeout) 
+		{
             delivery->delegate->onDeliveryFailure(this);
+
 			RELEASE(delivery);
-            m_pendingDeliveries.pop_front();
-        } else {
-            break;
+			it = m_pendingDeliveries.erase(it);
+			continue;
         }
     }
 }
