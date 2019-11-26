@@ -13,6 +13,10 @@ struct Behaviour {
 };
 
 struct Spaceship : public Behaviour {
+
+	float cooldown = 5.0f;
+	float timer = 0.0f;
+
     void start() override
     {
         gameObject->tag = (uint32)(Random.next() * UINT_MAX);
@@ -42,7 +46,7 @@ struct Spaceship : public Behaviour {
 			laser->tag = gameObject->tag;
 		}
 
-		if (!isClient && input.actionUp == ButtonState::Press) {
+		if (!isClient && input.actionUp == ButtonState::Press && timer >= cooldown) {
 			GameObject* laser1 = App->modNetServer->spawnBullet(gameObject, gameObject->angle);
 			laser1->tag = gameObject->tag;
 			GameObject* laser2 = App->modNetServer->spawnBullet(gameObject, gameObject->angle + 180.0f);
@@ -60,7 +64,11 @@ struct Spaceship : public Behaviour {
 			laser7->tag = gameObject->tag;
 			GameObject* laser8 = App->modNetServer->spawnBullet(gameObject, gameObject->angle - 135.0f);
 			laser8->tag = gameObject->tag;
+
+			timer = 0.0f;
 		}
+
+		timer += Time.deltaTime;
     }
 
     void onCollisionTriggered(Collider& c1, Collider& c2) override
