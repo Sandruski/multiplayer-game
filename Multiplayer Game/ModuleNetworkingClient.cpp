@@ -204,7 +204,7 @@ void ModuleNetworkingClient::onUpdate()
                 }
 
                 // Clear the queue
-                inputDataFront = inputDataBack;
+                //inputDataFront = inputDataBack;
 
                 sendPacket(packet, serverAddress);
             }
