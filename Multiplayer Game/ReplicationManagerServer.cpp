@@ -12,11 +12,32 @@ ReplicationManagerServer::~ReplicationManagerServer()
 
 void ReplicationManagerServer::create(uint32 networkID)
 {
+	for (auto& replicationCommand : m_replicationCommands)
+	{
+		if (replicationCommand.m_networkID == networkID)
+		{
+			replicationCommand.m_action = ReplicationAction::Create;
+			return;
+		}
+	}
+
     m_replicationCommands.push_back(ReplicationCommand(ReplicationAction::Create, networkID));
 }
 
 void ReplicationManagerServer::update(uint32 networkID)
 {
+	for (auto& replicationCommand : m_replicationCommands)
+	{
+		if (replicationCommand.m_networkID == networkID)
+		{
+			if (replicationCommand.m_action != ReplicationAction::Create)
+			{
+				replicationCommand.m_action = ReplicationAction::Update;
+			}
+			return;
+		}
+	}
+
 	m_replicationCommands.push_back(ReplicationCommand(ReplicationAction::Update, networkID));
 }
 
@@ -88,6 +109,7 @@ void ReplicationManagerTransmissionData::onDeliverySuccess(DeliveryManager* deli
 
 void ReplicationManagerTransmissionData::onDeliveryFailure(DeliveryManager* deliveryManager)
 {
+	/*
     for (const auto& replicationCommand : m_replicationCommands) {
 		switch (replicationCommand.m_action)
 		{
@@ -108,7 +130,7 @@ void ReplicationManagerTransmissionData::onDeliveryFailure(DeliveryManager* deli
 			break;
 		}
 		}
-    }
+    }*/
 }
 
 void ReplicationManagerTransmissionData::HandleCreateDeliveryFailure(uint32 networkID) const

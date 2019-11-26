@@ -31,6 +31,8 @@ void GameObject::write(OutputMemoryStream& packet) const
     // Behaviour component
 
     packet.Write(tag);
+
+	packet.Write(life);
 }
 
 void GameObject::read(const InputMemoryStream& packet)
@@ -42,6 +44,7 @@ void GameObject::read(const InputMemoryStream& packet)
     //packet.Read(interpolation.finalPosition.y);
 	packet.Read(position.x);
 	packet.Read(position.y);
+
     // Render component
     packet.Read(pivot.x);
     packet.Read(pivot.y);
@@ -106,6 +109,8 @@ void GameObject::read(const InputMemoryStream& packet)
     }
 
     packet.Read(tag);
+
+	packet.Read(life);
 }
 
 void GameObject::releaseComponents()

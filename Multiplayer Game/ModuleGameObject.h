@@ -44,6 +44,8 @@ public:
     // Tag for custom usage
     uint32 tag = 0;
 
+	uint32 life = 100;
+
 public:
     void write(OutputMemoryStream& packet) const;
     void read(const InputMemoryStream& packet);

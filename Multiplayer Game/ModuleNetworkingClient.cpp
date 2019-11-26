@@ -109,8 +109,6 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream& packet, c
             packet >> playerId;
             packet >> networkId;
 
-
-
             LOG("ModuleNetworkingClient::onPacketReceived() - Welcome from server");
             state = ClientState::Playing;
         } else if (message == ServerMessage::Unwelcome) {
@@ -124,10 +122,13 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream& packet, c
         else if (message == ServerMessage::Replication) {
             uint32 nextExpectedInputSequenceNumber;
             packet.Read(nextExpectedInputSequenceNumber);
+			if (nextExpectedInputSequenceNumber > inputDataFront)
+			{
+				inputDataFront = nextExpectedInputSequenceNumber;
+			}
+
             if (m_deliveryManager.processSequenceNumber(packet)) {
                 m_replicationManager.read(packet);
-
-				inputDataFront = nextExpectedInputSequenceNumber;
 				if (bClientPrediction)
 				{
 					for (uint32 i = inputDataFront; i < inputDataBack; ++i) {
@@ -143,15 +144,15 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream& packet, c
 					}
 				}
             }
-
-			if (m_deliveryManager.hasSequenceNumbersPendingAck()) {
-				OutputMemoryStream stream;
-				stream << ClientMessage::Ack;
-				m_deliveryManager.writeSequenceNumbersPendingAck(stream);
-				sendPacket(stream, fromAddress);
-			}
         }
     }
+
+	if (m_deliveryManager.hasSequenceNumbersPendingAck()) {
+		OutputMemoryStream stream;
+		stream << ClientMessage::Ack;
+		m_deliveryManager.writeSequenceNumbersPendingAck(stream);
+		sendPacket(stream, fromAddress);
+	}
 }
 
 void ModuleNetworkingClient::onUpdate()
@@ -207,10 +208,12 @@ void ModuleNetworkingClient::onUpdate()
                 }
 
                 // Clear the queue
-                //inputDataFront = inputDataBack;
+                inputDataFront = inputDataBack;
+
                 sendPacket(packet, serverAddress);
             }
         }
+
         secondsSinceLastPing += Time.deltaTime;
 
         if (secondsSinceLastPing >= PING_INTERVAL_SECONDS) {
