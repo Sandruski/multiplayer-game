@@ -88,6 +88,11 @@ void ReplicationManagerServer::writeCreateOrUpdate(OutputMemoryStream& packet, u
 	gameObject->write(packet);
 }
 
+bool ReplicationManagerServer::hasPendingReplicationCommandsToWrite() const
+{
+	return !m_replicationCommands.empty();
+}
+
 ReplicationCommand::ReplicationCommand(ReplicationAction action, uint32 networkID)
     : m_action(action)
     , m_networkID(networkID)

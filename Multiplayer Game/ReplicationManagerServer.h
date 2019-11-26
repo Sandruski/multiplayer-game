@@ -31,6 +31,8 @@ public:
 
 	void writeCreateOrUpdate(OutputMemoryStream& packet, uint32 networkID);
 
+	bool hasPendingReplicationCommandsToWrite() const;
+
 private:
     std::vector<ReplicationCommand> m_replicationCommands;
 };
