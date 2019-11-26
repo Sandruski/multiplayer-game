@@ -354,13 +354,13 @@ GameObject* ModuleNetworkingServer::spawnPlayer(ClientProxy& clientProxy, uint8 
     return clientProxy.gameObject;
 }
 
-GameObject* ModuleNetworkingServer::spawnBullet(GameObject* parent)
+GameObject* ModuleNetworkingServer::spawnBullet(GameObject* parent, float angle)
 {
     // Create a new game object with the player properties
     GameObject* gameObject = Instantiate();
     gameObject->size = { 20, 60 };
-    gameObject->angle = parent->angle;
-    gameObject->position = parent->position;
+	gameObject->position = parent->position;
+	gameObject->angle = angle;
     gameObject->texture = App->modResources->laser;
     gameObject->collider = App->modCollision->addCollider(ColliderType::Laser, gameObject);
 

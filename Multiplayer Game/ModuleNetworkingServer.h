@@ -69,7 +69,7 @@ public:
 
     GameObject* spawnPlayer(ClientProxy& clientProxy, uint8 spaceshipType);
 
-    GameObject* spawnBullet(GameObject* parent);
+    GameObject* spawnBullet(GameObject* parent, float angle);
 
     // NOTE(jesus): Here go spawn methods for each type of network objects
 

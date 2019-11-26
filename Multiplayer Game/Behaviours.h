@@ -33,9 +33,34 @@ struct Spaceship : public Behaviour {
         }
 
         if (!isClient && input.actionLeft == ButtonState::Press) {
-            GameObject* laser = App->modNetServer->spawnBullet(gameObject);
+			GameObject* laser = App->modNetServer->spawnBullet(gameObject, gameObject->angle);
             laser->tag = gameObject->tag;
         }
+
+		if (!isClient && input.actionRight == ButtonState::Press) {
+			GameObject* laser = App->modNetServer->spawnBullet(gameObject, gameObject->angle + 180.0f);
+			laser->tag = gameObject->tag;
+		}
+
+		if (!isClient && input.actionUp == ButtonState::Press) {
+			GameObject* laser1 = App->modNetServer->spawnBullet(gameObject, gameObject->angle);
+			laser1->tag = gameObject->tag;
+			GameObject* laser2 = App->modNetServer->spawnBullet(gameObject, gameObject->angle + 180.0f);
+			laser2->tag = gameObject->tag;
+			GameObject* laser3 = App->modNetServer->spawnBullet(gameObject, gameObject->angle + 90.0f);
+			laser3->tag = gameObject->tag;
+			GameObject* laser4 = App->modNetServer->spawnBullet(gameObject, gameObject->angle - 90.0f);
+			laser4->tag = gameObject->tag;
+
+			GameObject* laser5 = App->modNetServer->spawnBullet(gameObject, gameObject->angle + 45.0f);
+			laser5->tag = gameObject->tag;
+			GameObject* laser6 = App->modNetServer->spawnBullet(gameObject, gameObject->angle - 45.0f);
+			laser6->tag = gameObject->tag;
+			GameObject* laser7 = App->modNetServer->spawnBullet(gameObject, gameObject->angle + 135.0f);
+			laser7->tag = gameObject->tag;
+			GameObject* laser8 = App->modNetServer->spawnBullet(gameObject, gameObject->angle - 135.0f);
+			laser8->tag = gameObject->tag;
+		}
     }
 
     void onCollisionTriggered(Collider& c1, Collider& c2) override
