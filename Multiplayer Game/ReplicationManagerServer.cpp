@@ -88,11 +88,6 @@ void ReplicationManagerServer::writeCreateOrUpdate(OutputMemoryStream& packet, u
 	gameObject->write(packet);
 }
 
-bool ReplicationManagerServer::hasPendingReplicationCommandsToWrite() const
-{
-	return !m_replicationCommands.empty();
-}
-
 ReplicationCommand::ReplicationCommand(ReplicationAction action, uint32 networkID)
     : m_action(action)
     , m_networkID(networkID)
@@ -114,7 +109,6 @@ void ReplicationManagerTransmissionData::onDeliverySuccess(DeliveryManager* deli
 
 void ReplicationManagerTransmissionData::onDeliveryFailure(DeliveryManager* deliveryManager)
 {
-	/*
     for (const auto& replicationCommand : m_replicationCommands) {
 		switch (replicationCommand.m_action)
 		{
@@ -135,7 +129,7 @@ void ReplicationManagerTransmissionData::onDeliveryFailure(DeliveryManager* deli
 			break;
 		}
 		}
-    }*/
+    }
 }
 
 void ReplicationManagerTransmissionData::HandleCreateDeliveryFailure(uint32 networkID) const

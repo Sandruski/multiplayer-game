@@ -2,7 +2,6 @@
 
 struct GameObject {
 public:
-
     // Transform component
     vec2 position = vec2 { 0.0f, 0.0f };
 
