@@ -120,14 +120,10 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream& packet, c
         if (message == ServerMessage::Ping)
             lastPacketReceivedTime = Time.time;
         else if (message == ServerMessage::Replication) {
-            uint32 nextExpectedInputSequenceNumber;
-            packet.Read(nextExpectedInputSequenceNumber);
-			if (nextExpectedInputSequenceNumber > inputDataFront)
-			{
-				inputDataFront = nextExpectedInputSequenceNumber;
-			}
-
             if (m_deliveryManager.processSequenceNumber(packet)) {
+				uint32 nextExpectedInputSequenceNumber;
+				packet.Read(nextExpectedInputSequenceNumber);
+				inputDataFront = nextExpectedInputSequenceNumber;
                 m_replicationManager.read(packet);
 				if (bClientPrediction)
 				{

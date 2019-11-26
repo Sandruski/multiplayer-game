@@ -202,10 +202,10 @@ void ModuleNetworkingServer::onUpdate()
                     // Send InputExpectedSequenceNumber
 					OutputMemoryStream packet;
 					packet << ServerMessage::Replication;
-					packet.Write(clientProxy.nextExpectedInputSequenceNumber);
                     Delivery* delivery = clientProxy.m_deliveryManager.writeSequenceNumber(packet);
                     ReplicationManagerTransmissionData* replicationManagerTransmissionData = new ReplicationManagerTransmissionData(&clientProxy.m_replicationManager);
-                    clientProxy.m_replicationManager.write(packet, replicationManagerTransmissionData);
+					packet.Write(clientProxy.nextExpectedInputSequenceNumber);
+					clientProxy.m_replicationManager.write(packet, replicationManagerTransmissionData);
                     delivery->dispatchTime = Time.time;
                     delivery->delegate = replicationManagerTransmissionData;
                     sendPacket(packet, clientProxy.address);
