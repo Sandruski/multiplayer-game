@@ -16,6 +16,7 @@ struct Spaceship : public Behaviour {
 
 	float cooldown = 5.0f;
 	float timer = 0.0f;
+	bool die = false;
 
     void start() override
     {
@@ -24,6 +25,15 @@ struct Spaceship : public Behaviour {
 
     void onInput(const InputController& input, bool isClient = false) override
     {
+		if (die)
+		{
+			GameObject* orb = App->modNetServer->spawnOrb(gameObject);
+			orb->tag = gameObject->tag;
+			App->modNetServer->disconnectClient(gameObject);
+			die = false;
+			return;
+		}
+
         if (input.horizontalAxis != 0.0f) {
             const float rotateSpeed = 180.0f;
             gameObject->angle += input.horizontalAxis * rotateSpeed * Time.deltaTime;
@@ -83,11 +93,18 @@ struct Spaceship : public Behaviour {
 			gameObject->life -= 25;
 			if (gameObject->life == 0)
 			{
-				//App->modNetServer->disconnectClient(gameObject);
-				GameObject* orb = App->modNetServer->spawnOrb(gameObject);
-				orb->tag = gameObject->tag;
+				die = true;
 			}
         }
+		else if (c2.type == ColliderType::Orb && c2.gameObject->tag != gameObject->tag)
+		{
+			NetworkDestroy(c2.gameObject);
+
+			if (gameObject->life < 100)
+			{
+				gameObject->life += 25;
+			}
+		}
     }
 };
 

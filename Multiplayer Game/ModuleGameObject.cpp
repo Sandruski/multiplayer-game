@@ -169,8 +169,6 @@ bool ModuleGameObject::update()
         }
     }
 
-
-
     return true;
 }
 
