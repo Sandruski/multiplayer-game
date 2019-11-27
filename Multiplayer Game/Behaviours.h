@@ -14,7 +14,6 @@ struct Behaviour {
 
 struct Spaceship : public Behaviour {
 
-	float cooldown = 5.0f;
 	float timer = 0.0f;
 	bool die = false;
 
@@ -56,6 +55,7 @@ struct Spaceship : public Behaviour {
 			laser->tag = gameObject->tag;
 		}
 
+		const float cooldown = 5.0f;
 		if (!isClient && input.actionUp == ButtonState::Press && timer >= cooldown) {
 			GameObject* laser1 = App->modNetServer->spawnBullet(gameObject, gameObject->angle);
 			laser1->tag = gameObject->tag;
