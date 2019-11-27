@@ -44,6 +44,7 @@ public:
     uint32 tag = 0;
 
 	uint32 life = 100;
+	uint32 kills = 0;
 
 public:
     void write(OutputMemoryStream& packet) const;

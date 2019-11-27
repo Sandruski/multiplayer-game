@@ -84,17 +84,23 @@ struct Spaceship : public Behaviour {
     void onCollisionTriggered(Collider& c1, Collider& c2) override
     {
         if (c2.type == ColliderType::Laser && c2.gameObject->tag != gameObject->tag) {
-            NetworkDestroy(c2.gameObject); // Destroy the laser
-
-            // NOTE(jesus): spaceship was collided by a laser
-            // Be careful, if you do NetworkDestroy(gameObject) directly,
-            // the client proxy will poing to an invalid gameObject...
-            // instead, make the gameObject invisible or disconnect the client.
 			gameObject->life -= 25;
 			if (gameObject->life == 0)
 			{
 				die = true;
+
+				GameObject* killerGameObject = App->modNetServer->getClientGameObject(c2.gameObject->tag);
+				if (killerGameObject != nullptr)
+				{
+					++killerGameObject->kills;
+				}
 			}
+
+			NetworkDestroy(c2.gameObject); // Destroy the laser
+			// NOTE(jesus): spaceship was collided by a laser
+			// Be careful, if you do NetworkDestroy(gameObject) directly,
+			// the client proxy will poing to an invalid gameObject...
+			// instead, make the gameObject invisible or disconnect the client.
         }
 		else if (c2.type == ColliderType::Orb && c2.gameObject->tag != gameObject->tag)
 		{

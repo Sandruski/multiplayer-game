@@ -75,6 +75,8 @@ public:
 
     // NOTE(jesus): Here go spawn methods for each type of network objects
 
+	GameObject* getClientGameObject(uint32 tag);
+
 private:
     //////////////////////////////////////////////////////////////////////
     // Updating / destroying network objects

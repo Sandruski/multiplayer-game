@@ -33,6 +33,7 @@ void GameObject::write(OutputMemoryStream& packet) const
     packet.Write(tag);
 
 	packet.Write(life);
+	packet.Write(kills);
 }
 
 void GameObject::read(const InputMemoryStream& packet)
@@ -118,6 +119,7 @@ void GameObject::read(const InputMemoryStream& packet)
     packet.Read(tag);
 
 	packet.Read(life);
+	packet.Read(kills);
 }
 
 void GameObject::releaseComponents()

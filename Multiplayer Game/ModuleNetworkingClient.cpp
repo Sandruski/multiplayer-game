@@ -95,6 +95,21 @@ void ModuleNetworkingClient::onGui()
 			ImGui::Checkbox("Client prediction", &bClientPrediction);
         }
     }
+
+	if (state == ClientState::Playing) {
+		ImGui::SetNextWindowPos(ImVec2(850.0f, 20.0f));
+		ImGui::SetNextWindowSize(ImVec2(100.0f, 50.0f));
+		if (ImGui::Begin("KILLS"))
+		{
+			GameObject* playerGameObject = App->modLinkingContext->getNetworkGameObject(networkId);
+			if (playerGameObject != nullptr)
+			{
+				ImGui::Text("%u", playerGameObject->kills);
+			}
+
+			ImGui::End();
+		}
+	}
 }
 
 void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream& packet, const sockaddr_in& fromAddress)

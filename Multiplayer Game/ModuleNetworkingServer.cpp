@@ -413,6 +413,20 @@ GameObject* ModuleNetworkingServer::spawnOrb(GameObject* parent)
 	return gameObject;
 }
 
+GameObject* ModuleNetworkingServer::getClientGameObject(uint32 tag)
+{
+	for (const auto& clientProxy : clientProxies)
+	{
+		GameObject* clientGameObject = clientProxy.gameObject;
+		if (clientGameObject->tag == tag)
+		{
+			return clientGameObject;
+		}
+	}
+
+	return nullptr;
+}
+
 //////////////////////////////////////////////////////////////////////
 // Update / destruction
 //////////////////////////////////////////////////////////////////////
