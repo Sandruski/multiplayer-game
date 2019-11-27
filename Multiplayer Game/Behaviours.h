@@ -24,6 +24,9 @@ struct Spaceship : public Behaviour {
 
     void onInput(const InputController& input, bool isClient = false) override
     {
+		if (App->modNetClient->isEnabled())
+			return;
+
 		if (die)
 		{
 			GameObject* orb = App->modNetServer->spawnOrb(gameObject);
@@ -119,6 +122,9 @@ struct Laser : public Behaviour {
 
     void update() override
     {
+		if (App->modNetClient->isEnabled())
+			return;
+
         const float pixelsPerSecond = 1000.0f;
         gameObject->position += vec2FromDegrees(gameObject->angle) * pixelsPerSecond * Time.deltaTime;
 
@@ -137,13 +143,16 @@ struct Orb : public Behaviour {
 
 	void update() override
 	{
+		if (App->modNetClient->isEnabled())
+			return;
+
 		secondsSinceCreation += Time.deltaTime;
 
 		NetworkUpdate(gameObject);
 
-		//const float lifetimeSeconds = 2.0f;
-		//if (secondsSinceCreation > lifetimeSeconds)
-			//NetworkDestroy(gameObject);
+		const float lifetimeSeconds = 100.0f;
+		if (secondsSinceCreation > lifetimeSeconds)
+			NetworkDestroy(gameObject);
 	}
 };
 
@@ -151,12 +160,35 @@ struct Lifebar : public Behaviour {
 
 	void update() override
 	{
-		secondsSinceCreation += Time.deltaTime;
+		if (App->modNetServer->isEnabled())
+			return;
 
-		NetworkUpdate(gameObject);
-
-		//const float lifetimeSeconds = 2.0f;
-		//if (secondsSinceCreation > lifetimeSeconds)
-			//NetworkDestroy(gameObject);
+		GameObject* parent = gameObject->parent;
+		if (parent != nullptr)
+		{
+			gameObject->position = vec2{ parent->position.x, parent->position.y - parent->size.y / 2.0f };
+			
+			const float alpha = 0.8f;
+			if (parent->life == 100)
+			{
+				gameObject->color = vec4{ 0.0f, 1.0f, 0.0f, alpha };
+			}
+			else if (parent->life == 75)
+			{
+				gameObject->color = vec4{ 1.0f, 1.0f, 0.0f, alpha };
+			}
+			else if (parent->life == 50)
+			{
+				gameObject->color = vec4{ 1.0f, 0.5f, 0.0f, alpha };
+			}
+			else if (parent->life == 25)
+			{
+				gameObject->color = vec4{ 1.0f, 0.0f, 0.0f, alpha };
+			}
+			else
+			{
+				Destroy(gameObject);
+			}
+		}
 	}
 };

@@ -73,6 +73,8 @@ public:
 
 	GameObject* spawnOrb(GameObject* parent);
 
+	GameObject* spawnLifebar(GameObject* parent) const;
+
     // NOTE(jesus): Here go spawn methods for each type of network objects
 
 	GameObject* getClientGameObject(uint32 tag);

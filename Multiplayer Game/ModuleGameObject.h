@@ -46,6 +46,8 @@ public:
 	uint32 life = 100;
 	uint32 kills = 0;
 
+	GameObject* parent = nullptr;
+
 public:
     void write(OutputMemoryStream& packet) const;
     void read(const InputMemoryStream& packet);

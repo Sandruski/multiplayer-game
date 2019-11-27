@@ -102,6 +102,7 @@ void GameObject::read(const InputMemoryStream& packet)
         switch (type) {
         case ColliderType::Player: {
             behaviour = new Spaceship;
+			App->modNetServer->spawnLifebar(this);
             break;
         }
 
@@ -172,9 +173,6 @@ bool ModuleGameObject::preUpdate()
 
 bool ModuleGameObject::update()
 {
-	if (App->modNetClient->isEnabled())
-		return true;
-
     for (GameObject& gameObject : gameObjects) {
         if (gameObject.state == GameObject::UPDATING) {
             if (gameObject.behaviour != nullptr)

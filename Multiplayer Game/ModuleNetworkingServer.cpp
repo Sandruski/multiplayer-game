@@ -413,6 +413,20 @@ GameObject* ModuleNetworkingServer::spawnOrb(GameObject* parent)
 	return gameObject;
 }
 
+GameObject* ModuleNetworkingServer::spawnLifebar(GameObject* parent) const
+{
+	GameObject* gameObject = Instantiate();
+	gameObject->size = { 80, 8 };
+
+	// Create behaviour
+	gameObject->behaviour = new Lifebar;
+	gameObject->behaviour->gameObject = gameObject;
+
+	gameObject->parent = parent;
+
+	return gameObject;
+}
+
 GameObject* ModuleNetworkingServer::getClientGameObject(uint32 tag)
 {
 	for (const auto& clientProxy : clientProxies)
