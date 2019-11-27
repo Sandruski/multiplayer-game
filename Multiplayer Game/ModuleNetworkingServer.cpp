@@ -388,7 +388,8 @@ GameObject* ModuleNetworkingServer::spawnOrb(GameObject* parent)
 	GameObject* gameObject = Instantiate();
 	gameObject->size = { 30, 30 };
 	gameObject->position = parent->position;
-	gameObject->texture = App->modResources->laser;
+	gameObject->angle = parent->angle;
+	gameObject->texture = App->modResources->orb;
 	gameObject->collider = App->modCollision->addCollider(ColliderType::Orb, gameObject);
 
 	// Create behaviour

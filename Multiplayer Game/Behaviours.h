@@ -84,7 +84,8 @@ struct Spaceship : public Behaviour {
 			if (gameObject->life == 0)
 			{
 				//App->modNetServer->disconnectClient(gameObject);
-				App->modNetServer->spawnOrb(gameObject);
+				GameObject* orb = App->modNetServer->spawnOrb(gameObject);
+				orb->tag = gameObject->tag;
 			}
         }
     }
