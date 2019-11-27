@@ -169,21 +169,26 @@ struct Lifebar : public Behaviour {
 			gameObject->position = vec2{ parent->position.x, parent->position.y - parent->size.y / 2.0f };
 			
 			const float alpha = 0.8f;
+			const int height = 8;
 			if (parent->life == 100)
 			{
 				gameObject->color = vec4{ 0.0f, 1.0f, 0.0f, alpha };
+				gameObject->size = { 80, height };
 			}
 			else if (parent->life == 75)
 			{
 				gameObject->color = vec4{ 1.0f, 1.0f, 0.0f, alpha };
+				gameObject->size = { 60, height };
 			}
 			else if (parent->life == 50)
 			{
 				gameObject->color = vec4{ 1.0f, 0.5f, 0.0f, alpha };
+				gameObject->size = { 40, height };
 			}
 			else if (parent->life == 25)
 			{
 				gameObject->color = vec4{ 1.0f, 0.0f, 0.0f, alpha };
+				gameObject->size = { 20, height };
 			}
 			else
 			{

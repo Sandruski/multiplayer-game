@@ -416,7 +416,6 @@ GameObject* ModuleNetworkingServer::spawnOrb(GameObject* parent)
 GameObject* ModuleNetworkingServer::spawnLifebar(GameObject* parent) const
 {
 	GameObject* gameObject = Instantiate();
-	gameObject->size = { 80, 8 };
 
 	// Create behaviour
 	gameObject->behaviour = new Lifebar;
