@@ -146,3 +146,17 @@ struct Orb : public Behaviour {
 			//NetworkDestroy(gameObject);
 	}
 };
+
+struct Lifebar : public Behaviour {
+
+	void update() override
+	{
+		secondsSinceCreation += Time.deltaTime;
+
+		NetworkUpdate(gameObject);
+
+		//const float lifetimeSeconds = 2.0f;
+		//if (secondsSinceCreation > lifetimeSeconds)
+			//NetworkDestroy(gameObject);
+	}
+};

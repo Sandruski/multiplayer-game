@@ -19,14 +19,18 @@ void GameObject::write(OutputMemoryStream& packet) const
     packet.Write(color.w);
 
     // Texture component
-    std::string textureFilename = texture->filename;
+	std::string textureFilename = texture != nullptr ? texture->filename : "";
     packet.Write(textureFilename);
 
     packet.Write(order);
 
     // Collider component
-    packet.Write(collider->type);
-    collider->write(packet);
+	ColliderType colliderType = collider != nullptr ? collider->type : ColliderType::None;
+    packet.Write(colliderType);
+	if (collider != nullptr)
+	{
+		collider->write(packet);
+	}
 
     // Behaviour component
 
@@ -88,7 +92,10 @@ void GameObject::read(const InputMemoryStream& packet)
     if (collider == nullptr) {
         collider = App->modCollision->addCollider(type, this);
     }
-    collider->read(packet);
+	if (collider != nullptr)
+	{
+		collider->read(packet);
+	}
 
     // Behaviour component
     if (behaviour == nullptr) {
@@ -113,7 +120,11 @@ void GameObject::read(const InputMemoryStream& packet)
             break;
         }
         }
-        behaviour->gameObject = this;
+
+		if (behaviour != nullptr)
+		{
+			behaviour->gameObject = this;
+		}
     }
 
     packet.Read(tag);
