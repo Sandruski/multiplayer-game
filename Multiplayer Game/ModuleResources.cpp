@@ -28,6 +28,8 @@ bool ModuleResources::init()
 	spacecraft1 = App->modTextures->loadTexture("spacecraft1.png");
 	spacecraft2 = App->modTextures->loadTexture("spacecraft2.png");
 	spacecraft3 = App->modTextures->loadTexture("spacecraft3.png");
+	laser = App->modTextures->loadTexture("laser.png");
+	orb = App->modTextures->loadTexture("orb.png");
 	loadingFinished = true;
 	completionRatio = 1.0f;
 #else
@@ -38,6 +40,7 @@ bool ModuleResources::init()
 	loadTextureAsync("spacecraft2.png",      &spacecraft2);
 	loadTextureAsync("spacecraft3.png",      &spacecraft3);
 	loadTextureAsync("laser.png",            &laser);
+	loadTextureAsync("orb.png", &orb);
 #endif
 
 	return true;

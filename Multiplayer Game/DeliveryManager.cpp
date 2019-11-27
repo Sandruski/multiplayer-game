@@ -43,29 +43,45 @@ void DeliveryManager::writeSequenceNumbersPendingAck(OutputMemoryStream& packet)
 {
     std::size_t size = m_pendingAcks.size();
     packet.Write(size);
-	for (uint32 i = 0; i < size; ++i)
+	if (size > 0)
 	{
-        packet.Write(m_pendingAcks[i]);
-    }
+		uint32 firstSequenceNumber = m_pendingAcks.front();
+		packet.Write(firstSequenceNumber);
+	}
 
 	m_pendingAcks.clear();
 }
 
 void DeliveryManager::processAckSequenceNumbers(const InputMemoryStream& packet)
 {
-    std::size_t size;
-    packet.Read(size);
-	for (uint32 i = 0; i < size; ++i)
+	std::size_t size;
+	packet.Read(size);
+
+	if (size > 0)
 	{
-		uint32 sequenceNumber;
-		packet.Read(sequenceNumber);
+		uint32 firstSequenceNumber;
+		packet.Read(firstSequenceNumber);
+
+		uint32 lastSequenceNumber = firstSequenceNumber + static_cast<uint32>(size);
 
 		for (auto it = m_pendingDeliveries.begin(); it != m_pendingDeliveries.end(); ++it)
 		{
 			Delivery* delivery = *it;
-			if (delivery->sequenceNumber == sequenceNumber)
+			if (delivery->sequenceNumber == lastSequenceNumber)
 			{
 				delivery->delegate->onDeliverySuccess(this);
+
+				RELEASE(delivery);
+				it = m_pendingDeliveries.erase(it);
+				if (it == m_pendingDeliveries.end())
+				{
+					break;
+				}
+				continue;
+			}
+			else if (delivery->sequenceNumber < lastSequenceNumber)
+			{
+				delivery->delegate->onDeliveryFailure(this);
 
 				RELEASE(delivery);
 				it = m_pendingDeliveries.erase(it);

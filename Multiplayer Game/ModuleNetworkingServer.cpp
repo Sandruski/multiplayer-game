@@ -382,6 +382,33 @@ GameObject* ModuleNetworkingServer::spawnBullet(GameObject* parent, float angle)
     return gameObject;
 }
 
+GameObject* ModuleNetworkingServer::spawnOrb(GameObject* parent)
+{
+	// Create a new game object with the player properties
+	GameObject* gameObject = Instantiate();
+	gameObject->size = { 30, 30 };
+	gameObject->position = parent->position;
+	gameObject->texture = App->modResources->laser;
+	gameObject->collider = App->modCollision->addCollider(ColliderType::Orb, gameObject);
+
+	// Create behaviour
+	gameObject->behaviour = new Orb;
+	gameObject->behaviour->gameObject = gameObject;
+
+	// Assign a new network identity to the object
+	App->modLinkingContext->registerNetworkGameObject(gameObject);
+
+	// Notify all client proxies' replication manager to create the object remotely
+	for (int i = 0; i < MAX_CLIENTS; ++i) {
+		if (clientProxies[i].connected) {
+			// TODO(jesus): Notify this proxy's replication manager about the creation of this game object
+			clientProxies[i].m_replicationManager.create(gameObject->networkId);
+		}
+	}
+
+	return gameObject;
+}
+
 //////////////////////////////////////////////////////////////////////
 // Update / destruction
 //////////////////////////////////////////////////////////////////////

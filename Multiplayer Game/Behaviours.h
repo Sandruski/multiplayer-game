@@ -83,7 +83,8 @@ struct Spaceship : public Behaviour {
 			gameObject->life -= 25;
 			if (gameObject->life == 0)
 			{
-				App->modNetServer->disconnectClient(gameObject);
+				//App->modNetServer->disconnectClient(gameObject);
+				App->modNetServer->spawnOrb(gameObject);
 			}
         }
     }
@@ -105,4 +106,19 @@ struct Laser : public Behaviour {
         if (secondsSinceCreation > lifetimeSeconds)
             NetworkDestroy(gameObject);
     }
+};
+
+struct Orb : public Behaviour {
+	float secondsSinceCreation = 0.0f;
+
+	void update() override
+	{
+		secondsSinceCreation += Time.deltaTime;
+
+		NetworkUpdate(gameObject);
+
+		//const float lifetimeSeconds = 2.0f;
+		//if (secondsSinceCreation > lifetimeSeconds)
+			//NetworkDestroy(gameObject);
+	}
 };

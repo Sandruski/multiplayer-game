@@ -74,7 +74,9 @@ void GameObject::read(const InputMemoryStream& packet)
             texture = App->modResources->spacecraft3;
         } else if (textureFilename == "laser.png") {
             texture = App->modResources->laser;
-        }
+        } else if (textureFilename == "orb.png") {
+			texture = App->modResources->orb;
+		}
     }
 
     packet.Read(order);
@@ -99,6 +101,11 @@ void GameObject::read(const InputMemoryStream& packet)
             behaviour = new Laser;
             break;
         }
+
+		case ColliderType::Orb: {
+			behaviour = new Orb;
+			break;
+		}
 
         default: {
             ASSERT("Invalid collider type");

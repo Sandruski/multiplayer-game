@@ -71,6 +71,8 @@ public:
 
     GameObject* spawnBullet(GameObject* parent, float angle);
 
+	GameObject* spawnOrb(GameObject* parent);
+
     // NOTE(jesus): Here go spawn methods for each type of network objects
 
 private:
