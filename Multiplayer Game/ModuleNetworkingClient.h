@@ -13,6 +13,8 @@ public:
 
     void setPlayerInfo(const char* playerName, uint8 spaceshipType);
 
+	bool isClientGameObject(uint32 networkID) const;
+
 private:
     //////////////////////////////////////////////////////////////////////
     // ModuleNetworking virtual methods
@@ -68,7 +70,7 @@ private:
     float inputDeliveryIntervalSeconds = 0.05f;
     float secondsSinceLastInputDelivery = 0.0f;
 
-	bool bClientPrediction = false;
+	bool bClientPrediction = true;
 
     // Timeout / ping
 

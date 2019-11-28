@@ -17,6 +17,11 @@ void ModuleNetworkingClient::setPlayerInfo(const char* pPlayerName, uint8 pSpace
     spaceshipType = pSpaceshipType;
 }
 
+bool ModuleNetworkingClient::isClientGameObject(uint32 networkID) const
+{
+	return this->networkId == networkID;
+}
+
 //////////////////////////////////////////////////////////////////////
 // ModuleNetworking virtual methods
 //////////////////////////////////////////////////////////////////////
@@ -140,19 +145,33 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream& packet, c
 				uint32 nextExpectedInputSequenceNumber;
 				packet.Read(nextExpectedInputSequenceNumber);
 				inputDataFront = nextExpectedInputSequenceNumber;
-                m_replicationManager.read(packet);
+
+                m_replicationManager.read(packet);	
+
 				if (bClientPrediction)
 				{
+					GameObject* playerGameObject = App->modLinkingContext->getNetworkGameObject(networkId);
 					for (uint32 i = inputDataFront; i < inputDataBack; ++i) {
 						InputPacketData& inputPacketData = inputData[i % ArrayCount(inputData)];
 						InputController controller;
 						controller.horizontalAxis = inputPacketData.horizontalAxis;
 						controller.horizontalAxis = inputPacketData.verticalAxis;
 						unpackInputControllerButtons(inputPacketData.buttonBits, controller);
-						GameObject* playerGameObject = App->modLinkingContext->getNetworkGameObject(networkId);
 						if (playerGameObject != nullptr) {
 							playerGameObject->behaviour->onInput(controller, true);
 						}
+					}
+
+					const bool isSamePosition = (int)playerGameObject->position.x == (int)playerGameObject->auxPosition.x
+						&& (int)playerGameObject->position.y == (int)playerGameObject->auxPosition.y;
+					const bool isSameAngle = (int)playerGameObject->angle == (int)playerGameObject->auxAngle;
+					if (!isSamePosition)
+					{
+						playerGameObject->position = playerGameObject->auxPosition;
+					}
+					if (!isSameAngle)
+					{
+						playerGameObject->angle = playerGameObject->auxAngle;
 					}
 				}
             }

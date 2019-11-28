@@ -49,13 +49,17 @@ void GameObject::read(const InputMemoryStream& packet)
     //packet.Read(interpolation.finalPosition.y);
 	packet.Read(position.x);
 	packet.Read(position.y);
+	auxPosition = position;
 
     // Render component
     packet.Read(pivot.x);
     packet.Read(pivot.y);
     packet.Read(size.x);
     packet.Read(size.y);
-    packet.Read(angle);
+
+	packet.Read(angle);
+	auxAngle = angle;
+
     packet.Read(color.x);
     packet.Read(color.y);
     packet.Read(color.z);
@@ -102,7 +106,7 @@ void GameObject::read(const InputMemoryStream& packet)
         switch (type) {
         case ColliderType::Player: {
             behaviour = new Spaceship;
-			App->modNetServer->spawnLifebar(this);
+			child = App->modNetServer->spawnLifebar(this);
             break;
         }
 
@@ -137,13 +141,16 @@ void GameObject::read(const InputMemoryStream& packet)
 void GameObject::releaseComponents()
 {
     if (behaviour != nullptr) {
-        delete behaviour;
+		delete behaviour;
         behaviour = nullptr;
     }
     if (collider != nullptr) {
         App->modCollision->removeCollider(collider);
         collider = nullptr;
     }
+	if (child != nullptr) {
+		Destroy(child);
+	}
 }
 
 bool ModuleGameObject::init()

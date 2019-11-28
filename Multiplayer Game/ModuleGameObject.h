@@ -4,6 +4,7 @@ struct GameObject {
 public:
     // Transform component
     vec2 position = vec2 { 0.0f, 0.0f };
+	vec2 auxPosition = vec2{ 0.0f, 0.0f };
 
 	struct
 	{
@@ -20,6 +21,7 @@ public:
     vec2 pivot = vec2 { 0.5f, 0.5f };
     vec2 size = vec2 { 0.0f, 0.0f }; // NOTE(jesus): If equals 0, it takes the size of the texture
     float angle = 0.0f;
+	float auxAngle = 0.0f;
     vec4 color = vec4 { 1.0f, 1.0f, 1.0f, 1.0f }; // NOTE(jesus): The texture will tinted with this color
     Texture* texture = nullptr;
     int order = 0; // NOTE(jesus): determines the drawing order
@@ -47,6 +49,7 @@ public:
 	uint32 kills = 0;
 
 	GameObject* parent = nullptr;
+	GameObject* child = nullptr;
 
 public:
     void write(OutputMemoryStream& packet) const;

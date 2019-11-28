@@ -22,20 +22,19 @@ struct Spaceship : public Behaviour {
         gameObject->tag = (uint32)(Random.next() * UINT_MAX);
     }
 
-    void onInput(const InputController& input, bool isClient = false) override
-    {
-		if (App->modNetClient->isEnabled())
-			return;
-
+	void update() override 
+	{ 
 		if (die)
 		{
 			GameObject* orb = App->modNetServer->spawnOrb(gameObject);
 			orb->tag = gameObject->tag;
 			App->modNetServer->disconnectClient(gameObject);
 			die = false;
-			return;
 		}
+	}
 
+    void onInput(const InputController& input, bool isClient = false) override
+    {
         if (input.horizontalAxis != 0.0f) {
             const float rotateSpeed = 180.0f;
             gameObject->angle += input.horizontalAxis * rotateSpeed * Time.deltaTime;
@@ -189,10 +188,6 @@ struct Lifebar : public Behaviour {
 			{
 				gameObject->color = vec4{ 1.0f, 0.0f, 0.0f, alpha };
 				gameObject->size = { 20, height };
-			}
-			else
-			{
-				Destroy(gameObject);
 			}
 		}
 	}
