@@ -47,9 +47,8 @@ void DeliveryManager::writeSequenceNumbersPendingAck(OutputMemoryStream& packet)
 	{
 		uint32 firstSequenceNumber = m_pendingAcks.front();
 		packet.Write(firstSequenceNumber);
+		m_pendingAcks.clear();
 	}
-
-	m_pendingAcks.clear();
 }
 
 void DeliveryManager::processAckSequenceNumbers(const InputMemoryStream& packet)
@@ -62,34 +61,30 @@ void DeliveryManager::processAckSequenceNumbers(const InputMemoryStream& packet)
 		uint32 firstSequenceNumber;
 		packet.Read(firstSequenceNumber);
 
-		uint32 lastSequenceNumber = firstSequenceNumber + static_cast<uint32>(size);
-
-		for (auto it = m_pendingDeliveries.begin(); it != m_pendingDeliveries.end(); ++it)
+		uint32 nextAckdSequenceNumber = firstSequenceNumber;
+		uint32 onePastAckdSequenceNumber = nextAckdSequenceNumber + static_cast<uint32>(size);
+		while (nextAckdSequenceNumber < onePastAckdSequenceNumber && !m_pendingDeliveries.empty())
 		{
-			Delivery* delivery = *it;
-			if (delivery->sequenceNumber == lastSequenceNumber)
+			Delivery* delivery = m_pendingDeliveries.front();
+			if (delivery->sequenceNumber == nextAckdSequenceNumber)
 			{
 				delivery->delegate->onDeliverySuccess(this);
 
 				RELEASE(delivery);
-				it = m_pendingDeliveries.erase(it);
-				if (it == m_pendingDeliveries.end())
-				{
-					break;
-				}
-				continue;
+				m_pendingDeliveries.pop_front();
+				++nextAckdSequenceNumber;
 			}
-			else if (delivery->sequenceNumber < lastSequenceNumber)
+			else if (delivery->sequenceNumber < nextAckdSequenceNumber)
 			{
-				delivery->delegate->onDeliveryFailure(this);
+				Delivery* deliveryCopy = delivery;
+				m_pendingDeliveries.pop_front();
+				deliveryCopy->delegate->onDeliveryFailure(this);
 
 				RELEASE(delivery);
-				it = m_pendingDeliveries.erase(it);
-				if (it == m_pendingDeliveries.end())
-				{
-					break;
-				}
-				continue;
+			}
+			else
+			{
+				++nextAckdSequenceNumber;
 			}
 		}
 	}
@@ -98,21 +93,20 @@ void DeliveryManager::processAckSequenceNumbers(const InputMemoryStream& packet)
 void DeliveryManager::processTimedOutPackets()
 {
     float timeout = static_cast<float>(Time.time) - ACK_INTERVAL_SECONDS;
-	for (auto it = m_pendingDeliveries.begin(); it != m_pendingDeliveries.end(); ++it)
+	while (!m_pendingDeliveries.empty())
 	{
-		Delivery* delivery = *it;
+		Delivery* delivery = m_pendingDeliveries.front();
         if (delivery->dispatchTime < timeout) 
 		{
             delivery->delegate->onDeliveryFailure(this);
 
 			RELEASE(delivery);
-			it = m_pendingDeliveries.erase(it);
-			if (it == m_pendingDeliveries.end())
-			{
-				break;
-			}
-			continue;
+			m_pendingDeliveries.pop_front();
         }
+		else
+		{
+			break;
+		}
     }
 }
 
