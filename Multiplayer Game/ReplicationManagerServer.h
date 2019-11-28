@@ -44,6 +44,7 @@ public:
     void onDeliveryFailure(DeliveryManager* deliveryManager) override;
 
 	void HandleCreateDeliveryFailure(uint32 networkID) const;
+	void HandleUpdateDeliveryFailure(uint32 networkID) const;
 	void HandleDestroyDeliveryFailure(uint32 networkID) const;
 
     void AddTransmission(const ReplicationCommand& replicationCommand);

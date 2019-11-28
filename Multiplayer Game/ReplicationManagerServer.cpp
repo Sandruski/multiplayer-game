@@ -118,6 +118,12 @@ void ReplicationManagerTransmissionData::onDeliveryFailure(DeliveryManager* deli
 			break;
 		}
 
+		case ReplicationAction::Update:
+		{
+			HandleUpdateDeliveryFailure(replicationCommand.m_networkID);
+			break;
+		}
+
 		case ReplicationAction::Destroy:
 		{
 			HandleDestroyDeliveryFailure(replicationCommand.m_networkID);
@@ -137,6 +143,14 @@ void ReplicationManagerTransmissionData::HandleCreateDeliveryFailure(uint32 netw
 	if (App->modLinkingContext->getNetworkGameObject(networkID) != nullptr)
 	{
 		m_replicationManager->create(networkID);
+	}
+}
+
+void ReplicationManagerTransmissionData::HandleUpdateDeliveryFailure(uint32 networkID) const
+{
+	if (App->modLinkingContext->getNetworkGameObject(networkID) != nullptr)
+	{
+		m_replicationManager->update(networkID);
 	}
 }
 
