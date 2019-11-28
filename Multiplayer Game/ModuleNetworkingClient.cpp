@@ -161,18 +161,6 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream& packet, c
 							playerGameObject->behaviour->onInput(controller, true);
 						}
 					}
-
-					const bool isSamePosition = (int)playerGameObject->position.x == (int)playerGameObject->auxPosition.x
-						&& (int)playerGameObject->position.y == (int)playerGameObject->auxPosition.y;
-					const bool isSameAngle = (int)playerGameObject->angle == (int)playerGameObject->auxAngle;
-					if (!isSamePosition)
-					{
-						playerGameObject->position = playerGameObject->auxPosition;
-					}
-					if (!isSameAngle)
-					{
-						playerGameObject->angle = playerGameObject->auxAngle;
-					}
 				}
             }
         }

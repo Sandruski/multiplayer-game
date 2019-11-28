@@ -49,7 +49,6 @@ void GameObject::read(const InputMemoryStream& packet)
     //packet.Read(interpolation.finalPosition.y);
 	packet.Read(position.x);
 	packet.Read(position.y);
-	auxPosition = position;
 
     // Render component
     packet.Read(pivot.x);
@@ -58,7 +57,6 @@ void GameObject::read(const InputMemoryStream& packet)
     packet.Read(size.y);
 
 	packet.Read(angle);
-	auxAngle = angle;
 
     packet.Read(color.x);
     packet.Read(color.y);
