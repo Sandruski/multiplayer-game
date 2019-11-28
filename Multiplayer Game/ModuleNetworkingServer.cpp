@@ -171,7 +171,7 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream& packet, c
                         proxy->gamepad.horizontalAxis = inputData.horizontalAxis;
                         proxy->gamepad.verticalAxis = inputData.verticalAxis;
                         unpackInputControllerButtons(inputData.buttonBits, proxy->gamepad);
-						proxy->gameObject->behaviour->onInput(proxy->gamepad);
+						proxy->gameObject->behaviour->onInput(proxy->gamepad, false);
 						proxy->nextExpectedInputSequenceNumber = inputData.sequenceNumber + 1;
                     }
                 }
@@ -227,12 +227,12 @@ void ModuleNetworkingServer::onUpdate()
         if (secondsSinceLastPing >= PING_INTERVAL_SECONDS) {
             secondsSinceLastPing = 0.0f;
         }
-    }
 
-	for (auto& clientProxy : clientProxies)
-	{
-		clientProxy.m_deliveryManager.processTimedOutPackets();
-	}
+		for (auto& clientProxy : clientProxies)
+		{
+			clientProxy.m_deliveryManager.processTimedOutPackets();
+		}
+    }
 }
 
 void ModuleNetworkingServer::onConnectionReset(const sockaddr_in& fromAddress)

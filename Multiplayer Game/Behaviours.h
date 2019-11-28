@@ -7,7 +7,7 @@ struct Behaviour {
 
     virtual void update() { }
 
-    virtual void onInput(const InputController& input, bool isClient = false) { }
+    virtual void onInput(const InputController& input, bool isClient) { }
 
     virtual void onCollisionTriggered(Collider& c1, Collider& c2) { }
 };
