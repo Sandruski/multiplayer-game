@@ -200,6 +200,7 @@ void ModuleNetworkingClient::onUpdate()
             inputPacketData.sequenceNumber = currentInputData;
             inputPacketData.horizontalAxis = Input.horizontalAxis;
             inputPacketData.verticalAxis = Input.verticalAxis;
+			inputPacketData.buttonBits = packInputControllerButtons(Input);
 
 			if (bClientPrediction)
 			{
@@ -208,8 +209,6 @@ void ModuleNetworkingClient::onUpdate()
 					playerGameObject->behaviour->onInput(Input, true);
 				}
 			}
-
-            inputPacketData.buttonBits = packInputControllerButtons(Input);
 
             // Create packet (if there's input and the input delivery interval exceeded)
             if (secondsSinceLastInputDelivery > inputDeliveryIntervalSeconds) {
