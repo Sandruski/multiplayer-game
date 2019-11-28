@@ -431,7 +431,7 @@ GameObject* ModuleNetworkingServer::getClientGameObject(uint32 tag)
 	for (const auto& clientProxy : clientProxies)
 	{
 		GameObject* clientGameObject = clientProxy.gameObject;
-		if (clientGameObject->tag == tag)
+		if (clientGameObject != nullptr && clientGameObject->tag == tag)
 		{
 			return clientGameObject;
 		}

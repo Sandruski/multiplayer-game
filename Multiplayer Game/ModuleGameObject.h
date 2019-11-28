@@ -45,11 +45,12 @@ public:
     // Tag for custom usage
     uint32 tag = 0;
 
+	GameObject* parent = nullptr;
+
+	// Gameplay
 	uint32 life = 100;
 	uint32 kills = 0;
-
-	GameObject* parent = nullptr;
-	GameObject* child = nullptr;
+	GameObject* lifebar = nullptr;
 
 public:
     void write(OutputMemoryStream& packet) const;

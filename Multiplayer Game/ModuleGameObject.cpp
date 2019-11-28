@@ -106,7 +106,7 @@ void GameObject::read(const InputMemoryStream& packet)
         switch (type) {
         case ColliderType::Player: {
             behaviour = new Spaceship;
-			child = App->modNetServer->spawnLifebar(this);
+			lifebar = App->modNetServer->spawnLifebar(this);
             break;
         }
 
@@ -148,8 +148,10 @@ void GameObject::releaseComponents()
         App->modCollision->removeCollider(collider);
         collider = nullptr;
     }
-	if (child != nullptr) {
-		Destroy(child);
+	parent = nullptr;
+	if (lifebar != nullptr) {
+		Destroy(lifebar);
+		lifebar = nullptr;
 	}
 }
 
