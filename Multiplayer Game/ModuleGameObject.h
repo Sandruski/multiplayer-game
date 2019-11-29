@@ -11,12 +11,14 @@ public:
 	struct
 	{
 		vec2 initialPosition = vec2{ 0.0f, 0.0f };
+		vec2 prevPosition = vec2{ 0.0f, 0.0f };
 		float initialAngle = 0.0f;
 
 		vec2  finalPosition = vec2{ 0.0f, 0.0f };
 		float finalAngle = 0.0f;
 
 		float secondsElapsed = 0.0f;
+		float lerpMaxTime = 0.0f;
 	} interpolation;
 
     // Render component

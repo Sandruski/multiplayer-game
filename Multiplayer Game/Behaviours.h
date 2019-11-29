@@ -7,7 +7,12 @@ struct Behaviour {
 
     virtual void update() { }
 
-	virtual void updateClient() { }
+	virtual void updateClient()
+	{
+		gameObject->interpolation.secondsElapsed += Time.deltaTime;
+		float lerpTime = gameObject->interpolation.secondsElapsed / gameObject->interpolation.lerpMaxTime;
+		gameObject->position = lerpTemplated<vec2>(gameObject->interpolation.initialPosition, gameObject->interpolation.finalPosition, lerpTime >= 1.0f ? 1.0f : lerpTime);
+	}
 
     virtual void onInput(const InputController& input, bool isClient = false) { }
 
@@ -19,15 +24,6 @@ struct Spaceship : public Behaviour {
     {
         gameObject->tag = (uint32)(Random.next() * UINT_MAX);
     }
-
-	void updateClient() override
-	{
-		if (!gameObject->isClientSS)
-		{
-			gameObject->position = lerpTemplated<vec2>(gameObject->interpolation.initialPosition, gameObject->interpolation.finalPosition, gameObject->interpolation.secondsElapsed);
-			gameObject->interpolation.secondsElapsed += Time.deltaTime;
-		}
-	}
 
     void onInput(const InputController& input, bool isClient = false) override
     {
@@ -79,10 +75,4 @@ struct Laser : public Behaviour {
         if (secondsSinceCreation > lifetimeSeconds)
             NetworkDestroy(gameObject);
     }
-
-	void updateClient() override
-	{
-		gameObject->position = lerpTemplated<vec2>(gameObject->interpolation.initialPosition, gameObject->interpolation.finalPosition, gameObject->interpolation.secondsElapsed);
-		gameObject->interpolation.secondsElapsed += Time.deltaTime;
-	}
 };

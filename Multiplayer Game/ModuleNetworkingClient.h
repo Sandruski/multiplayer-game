@@ -15,6 +15,8 @@ public:
 
 	uint32 GetSpaceshipNetworkID() { return networkId; }
 
+	float ComputeAverageReplicationTime() const;
+
 private:
     //////////////////////////////////////////////////////////////////////
     // ModuleNetworking virtual methods
@@ -57,7 +59,10 @@ private:
     uint32 playerId = 0;
     uint32 networkId = 0;
 
-    // Input ///////////
+
+	static const int MAX_REPLICATION_TIME_BUFFER = 8;
+	float m_replicationTimeBuffer[MAX_REPLICATION_TIME_BUFFER];
+	uint32 m_replicationTimeFront = 0;
 
     static const int MAX_INPUT_DATA_SIMULTANEOUS_PACKETS = 64;
 
