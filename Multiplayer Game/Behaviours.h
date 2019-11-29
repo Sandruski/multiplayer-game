@@ -87,6 +87,8 @@ struct Spaceship : public Behaviour {
     {
         if (c2.type == ColliderType::Laser && c2.gameObject->tag != gameObject->tag) {
 			gameObject->life -= 25;
+			NetworkUpdate(gameObject);
+
 			if (gameObject->life == 0)
 			{
 				die = true;
@@ -95,10 +97,12 @@ struct Spaceship : public Behaviour {
 				if (killerGameObject != nullptr)
 				{
 					++killerGameObject->kills;
+					NetworkUpdate(killerGameObject);
 				}
 			}
 
 			NetworkDestroy(c2.gameObject); // Destroy the laser
+
 			// NOTE(jesus): spaceship was collided by a laser
 			// Be careful, if you do NetworkDestroy(gameObject) directly,
 			// the client proxy will poing to an invalid gameObject...
@@ -106,12 +110,13 @@ struct Spaceship : public Behaviour {
         }
 		else if (c2.type == ColliderType::Orb && c2.gameObject->tag != gameObject->tag)
 		{
-			NetworkDestroy(c2.gameObject);
-
 			if (gameObject->life < 100)
 			{
 				gameObject->life += 25;
+				NetworkUpdate(gameObject);
 			}
+
+			NetworkDestroy(c2.gameObject);
 		}
     }
 };

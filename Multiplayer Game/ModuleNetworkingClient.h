@@ -67,7 +67,7 @@ private:
     uint32 inputDataBack = 0;
     uint32 nextExpectedInputSequenceNumberFromServer = 0;
 
-    float inputDeliveryIntervalSeconds = 0.05f;
+    float inputDeliveryIntervalSeconds = 0.1f;
     float secondsSinceLastInputDelivery = 0.0f;
 
 	bool bClientPrediction = true;

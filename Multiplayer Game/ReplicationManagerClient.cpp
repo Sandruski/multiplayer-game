@@ -47,9 +47,8 @@ void ReplicationManagerClient::create(const InputMemoryStream& packet, uint32 ne
 
 		gameObject = App->modGameObject->Instantiate();
 		App->modLinkingContext->registerNetworkGameObjectWithNetworkId(gameObject, networkID);
+		gameObject->read(packet);
 	}
-
-	gameObject->read(packet);
 }
 
 void ReplicationManagerClient::update(const InputMemoryStream& packet, uint32 networkID) const
