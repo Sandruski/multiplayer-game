@@ -9,6 +9,7 @@ enum class ReplicationAction {
 
 struct ReplicationCommand {
 public:
+	ReplicationCommand();
     ReplicationCommand(ReplicationAction action, uint32 networkID);
 
 public:
@@ -27,12 +28,14 @@ public:
     void update(uint32 networkID);
     void destroy(uint32 networkID);
 
+	void remove(uint32 networkID);
+
     void write(OutputMemoryStream& packet, ReplicationManagerTransmissionData* replicationManagerTransmissionData);
 
 	void writeCreateOrUpdate(OutputMemoryStream& packet, uint32 networkID);
 
 private:
-    std::vector<ReplicationCommand> m_replicationCommands;
+	std::unordered_map<uint32, ReplicationCommand> m_replicationCommands;
 };
 
 class ReplicationManagerTransmissionData : public DeliveryDelegate {
@@ -42,6 +45,8 @@ public:
 
     void onDeliverySuccess(DeliveryManager* deliveryManager) override;
     void onDeliveryFailure(DeliveryManager* deliveryManager) override;
+
+	void HandleDestroyDeliverySuccess(uint32 networkID) const;
 
 	void HandleCreateDeliveryFailure(uint32 networkID) const;
 	void HandleUpdateDeliveryFailure(uint32 networkID) const;

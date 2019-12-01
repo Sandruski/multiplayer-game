@@ -191,11 +191,13 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream& packet, c
 void ModuleNetworkingServer::onUpdate()
 {
     if (state == ServerState::Listening) {
-        secondsSinceLastPing += Time.deltaTime;
 
         // Replication
         for (ClientProxy& clientProxy : clientProxies) {
             if (clientProxy.connected) {
+
+				clientProxy.m_deliveryManager.processTimedOutPackets();
+				
                 // TODO(jesus): If the replication interval passed and the replication manager of this proxy
                 //              has pending data, write and send a replication packet to this client.
                 if (clientProxy.secondsSinceLastReplication >= replicationDeliveryIntervalSeconds) {
@@ -214,23 +216,24 @@ void ModuleNetworkingServer::onUpdate()
                     clientProxy.secondsSinceLastReplication += Time.deltaTime;
                 }
 
-                if (secondsSinceLastPing >= PING_INTERVAL_SECONDS) {
-                    OutputMemoryStream packet;
-                    packet << ServerMessage::Ping;
-                    sendPacket(packet.GetBufferPtr(), packet.GetSize(), clientProxy.address);
-                }
-
                 if (Time.time - clientProxy.lastPacketReceivedTime >= DISCONNECT_TIMEOUT_SECONDS)
                     onConnectionReset(clientProxy.address);
             }
         }
-        if (secondsSinceLastPing >= PING_INTERVAL_SECONDS) {
-            secondsSinceLastPing = 0.0f;
-        }
 
-		for (auto& clientProxy : clientProxies)
-		{
-			clientProxy.m_deliveryManager.processTimedOutPackets();
+		secondsSinceLastPing += Time.deltaTime;
+
+		if (secondsSinceLastPing >= PING_INTERVAL_SECONDS) {
+			secondsSinceLastPing = 0.0f;
+
+			for (ClientProxy& clientProxy : clientProxies) {
+				if (clientProxy.connected)
+				{
+					OutputMemoryStream packet;
+					packet << ServerMessage::Ping;
+					sendPacket(packet.GetBufferPtr(), packet.GetSize(), clientProxy.address);
+				}
+			}
 		}
     }
 }
@@ -406,19 +409,6 @@ GameObject* ModuleNetworkingServer::spawnOrb(GameObject* parent)
 			clientProxies[i].m_replicationManager.create(gameObject->networkId);
 		}
 	}
-
-	return gameObject;
-}
-
-GameObject* ModuleNetworkingServer::spawnLifebar(GameObject* parent) const
-{
-	GameObject* gameObject = Instantiate();
-
-	// Create behaviour
-	gameObject->behaviour = new Lifebar;
-	gameObject->behaviour->gameObject = gameObject;
-
-	gameObject->parent = parent;
 
 	return gameObject;
 }

@@ -12,56 +12,44 @@ ReplicationManagerServer::~ReplicationManagerServer()
 
 void ReplicationManagerServer::create(uint32 networkID)
 {
-	for (auto& replicationCommand : m_replicationCommands)
-	{
-		if (replicationCommand.m_networkID == networkID)
-		{
-			replicationCommand.m_action = ReplicationAction::Create;
-			return;
-		}
-	}
-
-    m_replicationCommands.push_back(ReplicationCommand(ReplicationAction::Create, networkID));
+	m_replicationCommands[networkID] = ReplicationCommand(ReplicationAction::Create, networkID);
 }
 
 void ReplicationManagerServer::update(uint32 networkID)
 {
-	for (auto& replicationCommand : m_replicationCommands)
+	auto it = m_replicationCommands.find(networkID);
+	if (it == m_replicationCommands.end())
 	{
-		if (replicationCommand.m_networkID == networkID)
-		{
-			if (replicationCommand.m_action != ReplicationAction::Create)
-			{
-				replicationCommand.m_action = ReplicationAction::Update;
-			}
-			return;
-		}
+		create(networkID);
+		return;
 	}
 
-	m_replicationCommands.push_back(ReplicationCommand(ReplicationAction::Update, networkID));
+	m_replicationCommands[networkID].m_action = ReplicationAction::Update;
 }
 
 void ReplicationManagerServer::destroy(uint32 networkID)
 {
-	for (auto& replicationCommand : m_replicationCommands)
+	auto it = m_replicationCommands.find(networkID);
+	if (it == m_replicationCommands.end())
 	{
-		if (replicationCommand.m_networkID == networkID)
-		{
-			replicationCommand.m_action = ReplicationAction::Destroy;
-			return;
-		}
+		return;
 	}
 
-	m_replicationCommands.push_back(ReplicationCommand(ReplicationAction::Destroy, networkID));
+	m_replicationCommands[networkID].m_action = ReplicationAction::Destroy;
+}
+
+void ReplicationManagerServer::remove(uint32 networkID)
+{
+	m_replicationCommands.erase(networkID);
 }
 
 void ReplicationManagerServer::write(OutputMemoryStream& packet, ReplicationManagerTransmissionData* replicationManagerTransmissionData)
 {
-    for (const auto& replicationCommand : m_replicationCommands) {
+    for (auto& replicationCommand : m_replicationCommands) {
 
-        uint32 networkID = replicationCommand.m_networkID;
+        uint32 networkID = replicationCommand.second.m_networkID;
 		packet.Write(networkID);
-        ReplicationAction replicationAction = replicationCommand.m_action;
+        ReplicationAction replicationAction = replicationCommand.second.m_action;
 		packet.Write(replicationAction);
 
         switch (replicationAction) {
@@ -76,16 +64,20 @@ void ReplicationManagerServer::write(OutputMemoryStream& packet, ReplicationMana
         }
         }
 
-        replicationManagerTransmissionData->AddTransmission(replicationCommand);
-    }
+        replicationManagerTransmissionData->AddTransmission(replicationCommand.second);
 
-	m_replicationCommands.clear();
+		replicationCommand.second.m_action = ReplicationAction::None;
+    }
 }
 
 void ReplicationManagerServer::writeCreateOrUpdate(OutputMemoryStream& packet, uint32 networkID)
 {
 	GameObject* gameObject = App->modLinkingContext->getNetworkGameObject(networkID);
 	gameObject->write(packet);
+}
+
+ReplicationCommand::ReplicationCommand()
+{
 }
 
 ReplicationCommand::ReplicationCommand(ReplicationAction action, uint32 networkID)
@@ -105,6 +97,21 @@ ReplicationManagerTransmissionData::~ReplicationManagerTransmissionData()
 
 void ReplicationManagerTransmissionData::onDeliverySuccess(DeliveryManager* deliveryManager)
 {
+	for (const auto& replicationCommand : m_replicationCommands) {
+		switch (replicationCommand.m_action)
+		{
+		case ReplicationAction::Destroy:
+		{
+			HandleDestroyDeliveryFailure(replicationCommand.m_networkID);
+			break;
+		}
+
+		default:
+		{
+			break;
+		}
+		}
+	}
 }
 
 void ReplicationManagerTransmissionData::onDeliveryFailure(DeliveryManager* deliveryManager)
@@ -136,6 +143,11 @@ void ReplicationManagerTransmissionData::onDeliveryFailure(DeliveryManager* deli
 		}
 		}
     }
+}
+
+void ReplicationManagerTransmissionData::HandleDestroyDeliverySuccess(uint32 networkID) const
+{
+	m_replicationManager->remove(networkID);
 }
 
 void ReplicationManagerTransmissionData::HandleCreateDeliveryFailure(uint32 networkID) const

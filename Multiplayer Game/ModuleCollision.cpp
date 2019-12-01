@@ -83,9 +83,6 @@ void ModuleCollision::removeCollider(Collider* collider)
 
 bool ModuleCollision::update()
 {
-	if (App->modNetClient->isEnabled())
-		return true;
-
     // Pack colliders in activeColliders without empty cells
     uint32 activeColliderIndex = 0;
     for (int i = 0; i < MAX_COLLIDERS && activeColliderIndex < activeCollidersCount; ++i) {

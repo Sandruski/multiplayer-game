@@ -104,7 +104,7 @@ void GameObject::read(const InputMemoryStream& packet)
         switch (type) {
         case ColliderType::Player: {
             behaviour = new Spaceship;
-			lifebar = App->modNetServer->spawnLifebar(this);
+			lifebar = ModuleGameObject::Instantiate();
             break;
         }
 
@@ -133,6 +133,34 @@ void GameObject::read(const InputMemoryStream& packet)
     packet.Read(tag);
 
 	packet.Read(life);
+	if (lifebar != nullptr)
+	{
+		lifebar->position = vec2{ position.x, position.y - size.y / 2.0f };
+
+		const float alpha = 0.8f;
+		const int height = 8;
+		if (life == 100)
+		{
+			lifebar->color = vec4{ 0.0f, 1.0f, 0.0f, alpha };
+			lifebar->size = { 80, height };
+		}
+		else if (life == 75)
+		{
+			lifebar->color = vec4{ 1.0f, 1.0f, 0.0f, alpha };
+			lifebar->size = { 60, height };
+		}
+		else if (life == 50)
+		{
+			lifebar->color = vec4{ 1.0f, 0.5f, 0.0f, alpha };
+			lifebar->size = { 40, height };
+		}
+		else if (life == 25)
+		{
+			lifebar->color = vec4{ 1.0f, 0.0f, 0.0f, alpha };
+			lifebar->size = { 20, height };
+		}
+	}
+
 	packet.Read(kills);
 }
 
@@ -146,7 +174,6 @@ void GameObject::releaseComponents()
         App->modCollision->removeCollider(collider);
         collider = nullptr;
     }
-	parent = nullptr;
 	if (lifebar != nullptr) {
 		Destroy(lifebar);
 		lifebar = nullptr;

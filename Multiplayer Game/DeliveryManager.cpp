@@ -92,11 +92,10 @@ void DeliveryManager::processAckSequenceNumbers(const InputMemoryStream& packet)
 
 void DeliveryManager::processTimedOutPackets()
 {
-    float timeout = static_cast<float>(Time.time) - ACK_INTERVAL_SECONDS;
 	while (!m_pendingDeliveries.empty())
 	{
 		Delivery* delivery = m_pendingDeliveries.front();
-        if (delivery->dispatchTime < timeout) 
+        if (Time.time - delivery->dispatchTime >= ACK_INTERVAL_SECONDS)
 		{
             delivery->delegate->onDeliveryFailure(this);
 

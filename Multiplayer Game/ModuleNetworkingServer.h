@@ -73,8 +73,6 @@ public:
 
 	GameObject* spawnOrb(GameObject* parent);
 
-	GameObject* spawnLifebar(GameObject* parent) const;
-
     // NOTE(jesus): Here go spawn methods for each type of network objects
 
 	GameObject* getClientGameObject(uint32 tag);
@@ -105,7 +103,7 @@ private:
 
     float secondsSinceLastPing = 0.0f;
 
-    float replicationDeliveryIntervalSeconds = 0.f; // TODO: THIS CAN BE CHANGED
+    float replicationDeliveryIntervalSeconds = 0.1f;
 };
 
 // NOTE(jesus): It marks an object for replication updates

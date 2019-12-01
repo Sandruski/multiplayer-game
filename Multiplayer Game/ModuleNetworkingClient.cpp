@@ -17,11 +17,6 @@ void ModuleNetworkingClient::setPlayerInfo(const char* pPlayerName, uint8 pSpace
     spaceshipType = pSpaceshipType;
 }
 
-bool ModuleNetworkingClient::isClientGameObject(uint32 networkID) const
-{
-	return this->networkId == networkID;
-}
-
 //////////////////////////////////////////////////////////////////////
 // ModuleNetworking virtual methods
 //////////////////////////////////////////////////////////////////////
@@ -162,16 +157,22 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream& packet, c
 						}
 					}
 				}
+
+				// Make the camera focus the player game object
+				GameObject* playerGameObject = App->modLinkingContext->getNetworkGameObject(networkId);
+				if (playerGameObject != nullptr) {
+					App->modRender->cameraPosition = playerGameObject->position;
+				}
+
+				if (m_deliveryManager.hasSequenceNumbersPendingAck()) {
+					OutputMemoryStream stream;
+					stream << ClientMessage::Ack;
+					m_deliveryManager.writeSequenceNumbersPendingAck(stream);
+					sendPacket(stream, fromAddress);
+				}
             }
         }
     }
-
-	if (m_deliveryManager.hasSequenceNumbersPendingAck()) {
-		OutputMemoryStream stream;
-		stream << ClientMessage::Ack;
-		m_deliveryManager.writeSequenceNumbersPendingAck(stream);
-		sendPacket(stream, fromAddress);
-	}
 }
 
 void ModuleNetworkingClient::onUpdate()
@@ -235,20 +236,15 @@ void ModuleNetworkingClient::onUpdate()
         secondsSinceLastPing += Time.deltaTime;
 
         if (secondsSinceLastPing >= PING_INTERVAL_SECONDS) {
+			secondsSinceLastPing = 0.0f;
+
             OutputMemoryStream packet;
             packet << ClientMessage::Ping;
             sendPacket(packet, serverAddress);
-            secondsSinceLastPing = 0.0f;
         }
 
         if (Time.time - lastPacketReceivedTime >= DISCONNECT_TIMEOUT_SECONDS)
             disconnect();
-    }
-
-    // Make the camera focus the player game object
-    GameObject* playerGameObject = App->modLinkingContext->getNetworkGameObject(networkId);
-    if (playerGameObject != nullptr) {
-        App->modRender->cameraPosition = playerGameObject->position;
     }
 }
 
