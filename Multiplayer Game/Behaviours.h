@@ -41,9 +41,11 @@ struct Spaceship : public Behaviour {
 			App->modNetServer->disconnectClient(gameObject);
 			die = false;
 		}
+
+		timer += Time.deltaTime;
 	}
 
-    void onInput(const InputController& input, bool isClient = false) override
+    void onInput(const InputController& input, bool isClient) override
     {
         if (input.horizontalAxis != 0.0f) {
             const float rotateSpeed = 180.0f;
@@ -93,8 +95,6 @@ struct Spaceship : public Behaviour {
 
 			timer = 0.0f;
 		}
-
-		timer += Time.deltaTime;
     }
 
     void onCollisionTriggered(Collider& c1, Collider& c2) override

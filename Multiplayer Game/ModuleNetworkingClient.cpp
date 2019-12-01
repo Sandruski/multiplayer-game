@@ -165,7 +165,7 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream& packet, c
 						InputPacketData& inputPacketData = inputData[i % ArrayCount(inputData)];
 						InputController controller;
 						controller.horizontalAxis = inputPacketData.horizontalAxis;
-						controller.horizontalAxis = inputPacketData.verticalAxis;
+						controller.verticalAxis = inputPacketData.verticalAxis;
 						unpackInputControllerButtons(inputPacketData.buttonBits, controller);
 						if (playerGameObject != nullptr) {
 							playerGameObject->behaviour->onInput(controller, true);
