@@ -165,6 +165,7 @@ struct Orb : public Behaviour {
 			return;
 
 		secondsSinceCreation += Time.deltaTime;
+		gameObject->position.y += cos(secondsSinceCreation * 5.0f);
 
 		NetworkUpdate(gameObject);
 
