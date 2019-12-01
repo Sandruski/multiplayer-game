@@ -9,7 +9,7 @@ struct Behaviour {
 
 	virtual void updateClient()
 	{
-		if (!gameObject->isClientSS)
+		if (!gameObject->isClientSS && gameObject->interpolation.lerpMaxTime != 0.0f)
 		{
 			gameObject->interpolation.secondsElapsed += Time.deltaTime;
 			float lerpTime = gameObject->interpolation.secondsElapsed / gameObject->interpolation.lerpMaxTime;
