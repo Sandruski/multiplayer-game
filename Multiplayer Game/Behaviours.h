@@ -13,9 +13,9 @@ struct Behaviour {
 	{
 		if (!gameObject->isClientSS && gameObject->interpolation.lerpMaxTime != 0.0f)
 		{
-			gameObject->interpolation.secondsElapsed += Time.deltaTime;
 			float lerpTime = gameObject->interpolation.secondsElapsed / gameObject->interpolation.lerpMaxTime;
 			gameObject->position = lerpTemplated<vec2>(gameObject->interpolation.initialPosition, gameObject->interpolation.finalPosition, lerpTime >= 1.0f ? 1.0f : lerpTime);
+			gameObject->interpolation.secondsElapsed += Time.deltaTime;
 		}
 	}
 

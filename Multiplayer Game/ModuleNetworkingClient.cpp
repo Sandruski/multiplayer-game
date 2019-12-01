@@ -150,9 +150,6 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream& packet, c
         if (message == ServerMessage::Ping)
             lastPacketReceivedTime = Time.time;
         else if (message == ServerMessage::Replication) {
-			m_replicationTimeFront += 1;
-			float& currReplTime = m_replicationTimeBuffer[m_replicationTimeFront % ArrayCount(m_replicationTimeBuffer)];
-			currReplTime = 0.0f;
             if (m_deliveryManager.processSequenceNumber(packet)) {
 				uint32 nextExpectedInputSequenceNumber;
 				packet.Read(nextExpectedInputSequenceNumber);
@@ -173,6 +170,13 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream& packet, c
 							playerGameObject->behaviour->onInput(controller, true);
 						}
 					}
+				}
+
+				if (bEntityInterpolation)
+				{
+					m_replicationTimeFront += 1;
+					float& currReplTime = m_replicationTimeBuffer[m_replicationTimeFront % ArrayCount(m_replicationTimeBuffer)];
+					currReplTime = 0.0f;
 				}
 
 				if (m_deliveryManager.hasSequenceNumbersPendingAck()) {
@@ -257,8 +261,11 @@ void ModuleNetworkingClient::onUpdate()
         if (Time.time - lastPacketReceivedTime >= DISCONNECT_TIMEOUT_SECONDS)
             disconnect();
 
-		float& currReplTime = m_replicationTimeBuffer[m_replicationTimeFront % ArrayCount(m_replicationTimeBuffer)];
-		currReplTime += Time.deltaTime;
+		if (bEntityInterpolation)
+		{
+			float& currReplTime = m_replicationTimeBuffer[m_replicationTimeFront % ArrayCount(m_replicationTimeBuffer)];
+			currReplTime += Time.deltaTime;
+		}
     }
 
 	// Make the camera focus the player game object
