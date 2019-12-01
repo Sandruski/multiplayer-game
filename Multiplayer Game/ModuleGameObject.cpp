@@ -206,7 +206,7 @@ bool ModuleGameObject::preUpdate()
 
 bool ModuleGameObject::update()
 {
-	if (App->modNetClient->isEnabled())
+	if (App->modNetClient->isEnabled() && App->modNetClient->IsEntityInterpolationEnabled())
 	{
 		for (GameObject& gameObject : gameObjects) {
 			if (gameObject.state == GameObject::UPDATING) {

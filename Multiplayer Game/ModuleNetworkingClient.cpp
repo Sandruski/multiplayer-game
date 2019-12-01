@@ -106,6 +106,8 @@ void ModuleNetworkingClient::onGui()
             ImGui::InputFloat("Delivery interval (s)", &inputDeliveryIntervalSeconds, 0.01f, 0.1f, 4);
 
 			ImGui::Checkbox("Client prediction", &bClientPrediction);
+
+			ImGui::Checkbox("Entity Interpolation", &bEntityInterpolation);
         }
     }
 

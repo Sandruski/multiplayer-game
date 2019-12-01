@@ -17,6 +17,8 @@ public:
 
 	float ComputeAverageReplicationTime() const;
 
+	bool IsEntityInterpolationEnabled() const { return bEntityInterpolation; }
+
 private:
     //////////////////////////////////////////////////////////////////////
     // ModuleNetworking virtual methods
@@ -75,6 +77,8 @@ private:
     float secondsSinceLastInputDelivery = 0.0f;
 
 	bool bClientPrediction = false;
+
+	bool bEntityInterpolation = false;
 
     // Timeout / ping
 

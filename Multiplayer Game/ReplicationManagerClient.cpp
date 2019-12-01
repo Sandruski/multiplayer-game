@@ -66,7 +66,7 @@ void ReplicationManagerClient::update(const InputMemoryStream& packet, uint32 ne
 	else
 	{
 		gameObject->read(packet);
-		if (!gameObject->isClientSS)
+		if (App->modNetClient->IsEntityInterpolationEnabled() && !gameObject->isClientSS)
 		{
 			gameObject->interpolation.lerpMaxTime = App->modNetClient->ComputeAverageReplicationTime();
 			gameObject->interpolation.secondsElapsed = 0.0f;
