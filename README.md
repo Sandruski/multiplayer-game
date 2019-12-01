@@ -16,10 +16,10 @@ Join the server and start destroying other spaceships with your laser-gun. If an
 You're lucky to have the "Mandalorian's laser gun", the latest model of laser-guns with the following capabilities:
 - Press left: Front laser
 - Press Right: Back laser
-- Press Down: Move forward
 - Press Up: Special shot (try it!)
+- Press Down: Move forward (the laser-gun can also move your spaceship!)
 
-Don't get destroyed and become the hero of the humanity!
+Don't get destroyed and become a hero!
 
 # List of implemented features by author:
  Sandra: 
