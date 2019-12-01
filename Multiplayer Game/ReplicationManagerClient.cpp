@@ -48,6 +48,9 @@ void ReplicationManagerClient::create(const InputMemoryStream& packet, uint32 ne
 		gameObject = App->modGameObject->Instantiate();
 		App->modLinkingContext->registerNetworkGameObjectWithNetworkId(gameObject, networkID);
 		gameObject->read(packet);
+
+		if (gameObject->networkId == App->modNetClient->GetSpaceshipNetworkID())
+			gameObject->isClientSS = true;
 	}
 }
 
@@ -63,6 +66,14 @@ void ReplicationManagerClient::update(const InputMemoryStream& packet, uint32 ne
 	else
 	{
 		gameObject->read(packet);
+		if (!gameObject->isClientSS)
+		{
+			gameObject->interpolation.lerpMaxTime = App->modNetClient->ComputeAverageReplicationTime();
+			gameObject->interpolation.secondsElapsed = 0.0f;
+			gameObject->interpolation.initialPosition = gameObject->interpolation.prevPosition;
+			gameObject->interpolation.finalPosition = gameObject->position;
+			gameObject->position = gameObject->interpolation.initialPosition;
+		}
 	}
 }
 
