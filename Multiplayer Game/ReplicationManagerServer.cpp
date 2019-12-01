@@ -24,7 +24,11 @@ void ReplicationManagerServer::update(uint32 networkID)
 		return;
 	}
 
-	m_replicationCommands[networkID].m_action = ReplicationAction::Update;
+	if (m_replicationCommands[networkID].m_action != ReplicationAction::Create
+		&& m_replicationCommands[networkID].m_action != ReplicationAction::Destroy)
+	{
+		m_replicationCommands[networkID].m_action = ReplicationAction::Update;
+	}
 }
 
 void ReplicationManagerServer::destroy(uint32 networkID)
