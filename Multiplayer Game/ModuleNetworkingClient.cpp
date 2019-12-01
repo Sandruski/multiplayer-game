@@ -107,7 +107,7 @@ void ModuleNetworkingClient::onGui()
 
 			ImGui::Checkbox("Client prediction", &bClientPrediction);
 
-			ImGui::Checkbox("Entity Interpolation", &bEntityInterpolation);
+			ImGui::Checkbox("Entity Interpolation", &bEnableEntityInterpolationAtNextRepl);
         }
     }
 
@@ -155,6 +155,7 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream& packet, c
 				packet.Read(nextExpectedInputSequenceNumber);
 				inputDataFront = nextExpectedInputSequenceNumber;
 
+				bEntityInterpolation = bEnableEntityInterpolationAtNextRepl;
                 m_replicationManager.read(packet);	
 
 				if (bClientPrediction)

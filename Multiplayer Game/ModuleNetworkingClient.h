@@ -19,6 +19,8 @@ public:
 
 	bool IsEntityInterpolationEnabled() const { return bEntityInterpolation; }
 
+	void EnableEntityInterpolation() { bEnableEntityInterpolationAtNextRepl = true; }
+
 private:
     //////////////////////////////////////////////////////////////////////
     // ModuleNetworking virtual methods
@@ -79,7 +81,7 @@ private:
 	bool bClientPrediction = false;
 
 	bool bEntityInterpolation = false;
-
+	bool bEnableEntityInterpolationAtNextRepl = false;
     // Timeout / ping
 
     double lastPacketReceivedTime = 0.0f; // NOTE(jesus): Use this to implement client timeout
