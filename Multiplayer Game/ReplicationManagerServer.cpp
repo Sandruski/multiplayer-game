@@ -12,6 +12,12 @@ ReplicationManagerServer::~ReplicationManagerServer()
 
 void ReplicationManagerServer::create(uint32 networkID)
 {
+	auto it = m_replicationCommands.find(networkID);
+	if (it != m_replicationCommands.end())
+	{
+		return;
+	}
+
 	m_replicationCommands[networkID] = ReplicationCommand(ReplicationAction::Create, networkID);
 }
 
@@ -20,7 +26,6 @@ void ReplicationManagerServer::update(uint32 networkID)
 	auto it = m_replicationCommands.find(networkID);
 	if (it == m_replicationCommands.end())
 	{
-		create(networkID);
 		return;
 	}
 
