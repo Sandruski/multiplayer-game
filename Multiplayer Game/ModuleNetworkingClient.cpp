@@ -1,5 +1,6 @@
 #include "ModuleNetworkingClient.h"
 #include "Networks.h"
+#include "ModuleNetworkingClient.h"
 
 //////////////////////////////////////////////////////////////////////
 // ModuleNetworkingClient public methods
@@ -16,6 +17,17 @@ void ModuleNetworkingClient::setPlayerInfo(const char* pPlayerName, uint8 pSpace
     playerName = pPlayerName;
     spaceshipType = pSpaceshipType;
 }
+
+float ModuleNetworkingClient::ComputeAverageReplicationTime() const
+{
+	float avr = 0.0f;
+	for (int i = 0; i < MAX_REPLICATION_TIME_BUFFER; ++i)
+	{
+		avr += m_replicationTimeBuffer[i];
+	}
+	return avr / MAX_REPLICATION_TIME_BUFFER;
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // ModuleNetworking virtual methods
@@ -46,7 +58,7 @@ void ModuleNetworkingClient::onStart()
 
     inputDataFront = 0;
     inputDataBack = 0;
-
+	memset(m_replicationTimeBuffer, 0, sizeof(float) * MAX_REPLICATION_TIME_BUFFER);
     secondsSinceLastInputDelivery = 0.0f;
     secondsSinceLastPing = 0.0f;
     lastPacketReceivedTime = Time.time;
@@ -136,6 +148,9 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream& packet, c
         if (message == ServerMessage::Ping)
             lastPacketReceivedTime = Time.time;
         else if (message == ServerMessage::Replication) {
+			m_replicationTimeFront += 1;
+			float& currReplTime = m_replicationTimeBuffer[m_replicationTimeFront % ArrayCount(m_replicationTimeBuffer)];
+			currReplTime = 0.0f;
             if (m_deliveryManager.processSequenceNumber(packet)) {
 				uint32 nextExpectedInputSequenceNumber;
 				packet.Read(nextExpectedInputSequenceNumber);
@@ -239,6 +254,9 @@ void ModuleNetworkingClient::onUpdate()
 
         if (Time.time - lastPacketReceivedTime >= DISCONNECT_TIMEOUT_SECONDS)
             disconnect();
+
+		float& currReplTime = m_replicationTimeBuffer[m_replicationTimeFront % ArrayCount(m_replicationTimeBuffer)];
+		currReplTime += Time.deltaTime;
     }
 
 	// Make the camera focus the player game object

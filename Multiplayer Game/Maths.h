@@ -107,8 +107,8 @@ vec4 lerp(vec4 a, vec4 b, float t) { vec4 c = a + t * (b - a); return c; }
 float dot(vec4 a, vec4 b) { return a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w; }
 bool isZero(vec4 a) { return dot(a, a) < FLT_EPSILON; }
 
-
-
+template <typename T>
+T lerpTemplated(T a, T b, float t) { T c = a + t * (b - a); return c; }
 ////////////////////////////////////////////////////////////////////////
 // MAT4
 ////////////////////////////////////////////////////////////////////////

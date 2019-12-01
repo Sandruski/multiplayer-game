@@ -9,6 +9,16 @@ struct Behaviour {
 
     virtual void onInput(const InputController& input, bool isClient) { }
 
+	virtual void updateClient()
+	{
+		if (!gameObject->isClientSS && gameObject->interpolation.lerpMaxTime != 0.0f)
+		{
+			gameObject->interpolation.secondsElapsed += Time.deltaTime;
+			float lerpTime = gameObject->interpolation.secondsElapsed / gameObject->interpolation.lerpMaxTime;
+			gameObject->position = lerpTemplated<vec2>(gameObject->interpolation.initialPosition, gameObject->interpolation.finalPosition, lerpTime >= 1.0f ? 1.0f : lerpTime);
+		}
+	}
+
     virtual void onCollisionTriggered(Collider& c1, Collider& c2) { }
 };
 
