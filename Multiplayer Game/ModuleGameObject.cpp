@@ -104,7 +104,10 @@ void GameObject::read(const InputMemoryStream& packet)
         switch (type) {
         case ColliderType::Player: {
             behaviour = new Spaceship;
-			lifebar = ModuleGameObject::Instantiate();
+			if (lifebar == nullptr)
+			{
+				lifebar = ModuleGameObject::Instantiate();
+			}
             break;
         }
 

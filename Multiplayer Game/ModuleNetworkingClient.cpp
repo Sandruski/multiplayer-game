@@ -158,12 +158,6 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream& packet, c
 					}
 				}
 
-				// Make the camera focus the player game object
-				GameObject* playerGameObject = App->modLinkingContext->getNetworkGameObject(networkId);
-				if (playerGameObject != nullptr) {
-					App->modRender->cameraPosition = playerGameObject->position;
-				}
-
 				if (m_deliveryManager.hasSequenceNumbersPendingAck()) {
 					OutputMemoryStream stream;
 					stream << ClientMessage::Ack;
@@ -246,6 +240,12 @@ void ModuleNetworkingClient::onUpdate()
         if (Time.time - lastPacketReceivedTime >= DISCONNECT_TIMEOUT_SECONDS)
             disconnect();
     }
+
+	// Make the camera focus the player game object
+	GameObject* playerGameObject = App->modLinkingContext->getNetworkGameObject(networkId);
+	if (playerGameObject != nullptr) {
+		App->modRender->cameraPosition = playerGameObject->position;
+	}
 }
 
 void ModuleNetworkingClient::onConnectionReset(const sockaddr_in& fromAddress)

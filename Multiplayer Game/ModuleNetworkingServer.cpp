@@ -192,6 +192,8 @@ void ModuleNetworkingServer::onUpdate()
 {
     if (state == ServerState::Listening) {
 
+		secondsSinceLastPing += Time.deltaTime;
+
         // Replication
         for (ClientProxy& clientProxy : clientProxies) {
             if (clientProxy.connected) {
@@ -216,24 +218,19 @@ void ModuleNetworkingServer::onUpdate()
                     clientProxy.secondsSinceLastReplication += Time.deltaTime;
                 }
 
+				if (secondsSinceLastPing >= PING_INTERVAL_SECONDS) {
+					OutputMemoryStream packet;
+					packet << ServerMessage::Ping;
+					sendPacket(packet.GetBufferPtr(), packet.GetSize(), clientProxy.address);
+				}
+
                 if (Time.time - clientProxy.lastPacketReceivedTime >= DISCONNECT_TIMEOUT_SECONDS)
                     onConnectionReset(clientProxy.address);
             }
         }
 
-		secondsSinceLastPing += Time.deltaTime;
-
 		if (secondsSinceLastPing >= PING_INTERVAL_SECONDS) {
 			secondsSinceLastPing = 0.0f;
-
-			for (ClientProxy& clientProxy : clientProxies) {
-				if (clientProxy.connected)
-				{
-					OutputMemoryStream packet;
-					packet << ServerMessage::Ping;
-					sendPacket(packet.GetBufferPtr(), packet.GetSize(), clientProxy.address);
-				}
-			}
 		}
     }
 }
