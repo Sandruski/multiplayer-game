@@ -78,10 +78,10 @@ private:
     float inputDeliveryIntervalSeconds = 0.05f;
     float secondsSinceLastInputDelivery = 0.0f;
 
-	bool bClientPrediction = false;
+	bool bClientPrediction = true;
 
-	bool bEntityInterpolation = false;
-	bool bEnableEntityInterpolationAtNextRepl = false;
+	bool bEntityInterpolation = true;
+	bool bEnableEntityInterpolationAtNextRepl = true;
     // Timeout / ping
 
     double lastPacketReceivedTime = 0.0f; // NOTE(jesus): Use this to implement client timeout
