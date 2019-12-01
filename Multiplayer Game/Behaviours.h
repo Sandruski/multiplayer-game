@@ -9,9 +9,12 @@ struct Behaviour {
 
 	virtual void updateClient()
 	{
-		gameObject->interpolation.secondsElapsed += Time.deltaTime;
-		float lerpTime = gameObject->interpolation.secondsElapsed / gameObject->interpolation.lerpMaxTime;
-		gameObject->position = lerpTemplated<vec2>(gameObject->interpolation.initialPosition, gameObject->interpolation.finalPosition, lerpTime >= 1.0f ? 1.0f : lerpTime);
+		if (!gameObject->isClientSS)
+		{
+			gameObject->interpolation.secondsElapsed += Time.deltaTime;
+			float lerpTime = gameObject->interpolation.secondsElapsed / gameObject->interpolation.lerpMaxTime;
+			gameObject->position = lerpTemplated<vec2>(gameObject->interpolation.initialPosition, gameObject->interpolation.finalPosition, lerpTime >= 1.0f ? 1.0f : lerpTime);
+		}
 	}
 
     virtual void onInput(const InputController& input, bool isClient = false) { }

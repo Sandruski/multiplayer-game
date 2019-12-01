@@ -67,11 +67,14 @@ void ReplicationManagerClient::update(const InputMemoryStream& packet, uint32 ne
 	else
 	{
 		gameObject->read(packet);
-		gameObject->interpolation.lerpMaxTime = App->modNetClient->ComputeAverageReplicationTime();
-		gameObject->interpolation.secondsElapsed = 0.0f;
-		gameObject->interpolation.initialPosition = gameObject->interpolation.prevPosition;
-		gameObject->interpolation.finalPosition = gameObject->position;
-		gameObject->position = gameObject->interpolation.initialPosition;
+		if (!gameObject->isClientSS)
+		{
+			gameObject->interpolation.lerpMaxTime = App->modNetClient->ComputeAverageReplicationTime();
+			gameObject->interpolation.secondsElapsed = 0.0f;
+			gameObject->interpolation.initialPosition = gameObject->interpolation.prevPosition;
+			gameObject->interpolation.finalPosition = gameObject->position;
+			gameObject->position = gameObject->interpolation.initialPosition;
+		}
 	}
 }
 
