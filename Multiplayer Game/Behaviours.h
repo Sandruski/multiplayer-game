@@ -44,6 +44,10 @@ struct Spaceship : public Behaviour {
         if (input.actionDown == ButtonState::Pressed) {
             const float advanceSpeed = 200.0f;
             gameObject->position += vec2FromDegrees(gameObject->angle) * advanceSpeed * Time.deltaTime;
+			if (gameObject->lifebar != nullptr)
+			{
+				gameObject->lifebar->position = vec2{ gameObject->position.x, gameObject->position.y - gameObject->size.y / 2.0f };
+			}
 			isClient ? void() : NetworkUpdate(gameObject);
         }
 
